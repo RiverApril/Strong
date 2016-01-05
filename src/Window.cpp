@@ -5,5 +5,5 @@ Window::Window(){
 }
 
 void Window::update(){
-    
+    client->update();
 }

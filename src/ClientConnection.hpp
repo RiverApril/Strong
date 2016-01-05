@@ -7,21 +7,23 @@ class Server;
 
 class ClientConnection{
 public:
-    
+
     TCPsocket* hostSocket;
-    
+
     TCPsocket* socket;
     IPaddress* ip = new IPaddress();
-    
+
     Server* server;
-    
+
     SDL_Thread* threadRecive;
     bool connected = true;
-    
+
+    string username = "";
+
     ClientConnection(TCPsocket* hostSocket, TCPsocket* socket, Server* server);
-    
-    void update(Server server);
-    
+
+    void update();
+
 };
 
 int updateThread(void* data);

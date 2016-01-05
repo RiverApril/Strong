@@ -1,14 +1,16 @@
 #include "Client.hpp"
 
 Client::Client(){
-    
+
 }
 
 void Client::update(){
-    
+
     while(clientIsConnected){
-        
-        size_t s = 1+sizeof(size_t);
+
+        printf("a\n");
+
+        PacketSize_t s = 1+sizeof(PacketSize_t);
         unsigned char data1[s];
         int r = Network::reciveData(socket, data1, s);
         if(r == 0){
@@ -16,20 +18,38 @@ void Client::update(){
         }else if(r == -1){
             serverDisconnected(false);
         }else{
-            s = data1[1] & (data1[2] << 1) & (data1[3] << 2) & (data1[4] << 3);
-            unsigned char data2[s];
-            int r = Network::reciveData(socket, data2, s);
-            if(r == 0){
-                serverDisconnected(true);
-            }else if(r == -1){
-                serverDisconnected(false);
+
+            printf("b\n");
+
+            s = 0;
+
+            printf("s[%d] = %u\n", 0, data1[0]);
+            for(size_t i=0;i<sizeof(PacketSize_t);i++){
+                s |= (data1[i+1] << (8*i));
+                printf("s[%zu] = %u\n", i+1, data1[i+1]);
+            }
+            printf("s = %u\n", s);
+
+            if(s > 0){
+                unsigned char data2[s];
+                int r = Network::reciveData(socket, data2, s);
+                if(r == 0){
+                    serverDisconnected(true);
+                }else if(r == -1){
+                    serverDisconnected(false);
+                }else{
+
+                    printf("c\n");
+
+                    processPacket(data1[0], data2);
+                }
             }else{
-                processPacket(data1[0], data2);
+                processPacket(data1[0], nullptr);
             }
         }
-        
+
     }
-    
+
 }
 
 void Client::connectToServer(){
@@ -38,6 +58,8 @@ void Client::connectToServer(){
         cin >> address;
         if(address.size() > 0){
             break;
+        }else{
+            printf("You must enter an Address\n");
         }
     }
     while(true){
@@ -54,8 +76,12 @@ void Client::connectToServer(){
         cin >> username;
         if(username.size() > 0){
             break;
+        }else{
+            printf("You must enter a Username\n");
         }
     }
+
+    connectToServer(address, port, username);
 }
 
 void Client::connectToServer(string address, int port, string username){
@@ -64,7 +90,7 @@ void Client::connectToServer(string address, int port, string username){
     }else{
         clientIsConnected = true;
         printf("Connecting to server: %s:%d\n", address.c_str(), port);
-        
+
         bool success = Network::connectToHost(address, port, socket, ip);
         if(success){
             printf("Connected to server\n");
@@ -88,17 +114,26 @@ void Client::serverDisconnected(bool intentional){
 
 void Client::processPacket(unsigned char code, unsigned char* data){
     printf("Client recived code: %d\n", code);
-    unsigned char position = 0;
+    size_t position = 0;
     switch(code){
         case PACKET_TC_REQUEST_USERNAME:{
-            vector<unsigned char> data;
-            Network::initPacket(data, PACKET_TS_USERNAME);
-            
-            Network::addDataString(data, username);
-            
-            Network::finishPacket(data);
-            Network::sendData(socket, data);
+            sendPacket(PACKET_TS_USERNAME);
             break;
         }
     }
+}
+
+void Client::sendPacket(unsigned char code){
+    vector<unsigned char> data;
+    Network::initPacket(data, code);
+
+    switch(code){
+        case PACKET_TS_USERNAME:{
+            Network::addDataString(data, username);
+            break;
+        }
+    }
+
+    Network::finishPacket(data);
+    Network::sendData(socket, data);
 }

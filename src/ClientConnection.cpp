@@ -5,7 +5,7 @@ ClientConnection::ClientConnection(TCPsocket* hostSocket, TCPsocket* socket, Ser
     this->hostSocket = hostSocket;
     this->socket = socket;
     this->server = server;
-    
+
     if((ip = SDLNet_TCP_GetPeerAddress(*socket))){
         uint32_t n = SDLNet_Read32(&ip->host);
         string address;
@@ -16,16 +16,17 @@ ClientConnection::ClientConnection(TCPsocket* hostSocket, TCPsocket* socket, Ser
         address += to_string((n & 0x0000FF00) >> 8);
         address += ".";
         address += to_string((n & 0x000000FF));
-        printf("Clint connected through address: %s:%d\n", address.c_str(), SDLNet_Read16(&ip->port));
+        printf("Client connected through address: %s:%d\n", address.c_str(), SDLNet_Read16(&ip->port));
 	}else{
 		fprintf(stderr, "SDLNet_TCP_GetPeerAddress: %s\n", SDLNet_GetError());
     }
-    
+
     threadRecive = SDL_CreateThread(updateThread, NULL, this);
-    
+
 }
 
-void ClientConnection::update(Server server){
+void ClientConnection::update(){
+
 }
 
 int updateThread(void* data){
@@ -56,5 +57,5 @@ int updateThread(void* data){
         }
     }
     return 0;
-    
+
 }

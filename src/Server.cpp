@@ -2,27 +2,28 @@
 
 
 Server::Server(){
-    
+
 }
 
 void Server::update(){
-    
+
     //Look for new client
     TCPsocket* clientSocket = new TCPsocket();
     Network::acceptGuest(socket, clientSocket);
     if(*clientSocket){
-        ClientConnection* clientConnection = new ClientConnection(socket, clientSocket);
+        ClientConnection* clientConnection = new ClientConnection(socket, clientSocket, this);
         clientList.push_back(clientConnection);
-        printf("Client connected\n");
+        sendPacket(clientConnection, PACKET_TC_REQUEST_USERNAME);
+        printf("Sent username request\n");
     }else{
         delete clientSocket;
     }
-    
+
     //Update client connections
-    for(ClientConnection* client: clientList){
-        client->update(this);
+    for(ClientConnection* cc: clientList){
+        cc->update();
     }
-    
+
     //Remove disconnected clients
     while(clientRemoveList.size() > 0){
         for(int i=0;i<clientList.size();i++){
@@ -33,8 +34,8 @@ void Server::update(){
         }
         clientRemoveList.erase(clientRemoveList.begin());
     }
-    
-    
+
+
 }
 
 void Server::startServer(){
@@ -56,7 +57,7 @@ void Server::startServer(int port){
     }else{
         serverIsStarted = true;
         printf("Starting server on port: %d\n", port);
-        
+
         bool success = Network::initHost(port, socket, ip);
         if(success){
             printf("Server Started\n");
@@ -69,8 +70,8 @@ void Server::startServer(int port){
 }
 
 void Server::clientDisconnected(ClientConnection* cc, bool intentional){
-	SDLNet_TCP_Close(cc->socket);
-    clientRemoveList->push_back(cc);
+	SDLNet_TCP_Close(*(cc->socket));
+    clientRemoveList.push_back(cc);
     if(intentional){
         printf("Client disconnected\n");
     }else{
@@ -80,12 +81,26 @@ void Server::clientDisconnected(ClientConnection* cc, bool intentional){
 
 void Server::processPacket(ClientConnection* from, unsigned char code, unsigned char* data){
     printf("Server recived code: %d\n", code);
-    unsigned char position = 0;
+    size_t position = 0;
     switch (code) {
         case PACKET_TS_USERNAME:{
-            Network::readDataString(&data, &position, from->username);
-            printf("Username set: %s\n", from->username);
+            Network::readDataString(data, position, from->username);
+            printf("Username set: %s\n", from->username.c_str());
             break;
         }
     }
+}
+
+void Server::sendPacket(ClientConnection* to, unsigned char code){
+    vector<unsigned char> data;
+    Network::initPacket(data, code);
+
+    switch(code){
+        case PACKET_TC_REQUEST_USERNAME:{
+            break;
+        }
+    }
+
+    Network::finishPacket(data);
+    Network::sendData(to->socket, data);
 }
