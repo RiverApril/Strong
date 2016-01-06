@@ -29,17 +29,17 @@ namespace Network{
     void finishPacket(vector<unsigned char>& data);
 
     int reciveData(TCPsocket* socket, unsigned char* data, PacketSize_t dataSize);
-
+    void recivePacket(TCPsocket* socket, function<void(int, unsigned char, unsigned char*)> process);
 
     template<typename T>
     void addDataNumber(vector<unsigned char>& data, T n);
     void addDataUChar(vector<unsigned char>& data, unsigned char n);
-    void addDataString(vector<unsigned char>& data, string n);
+    void addDataShortString(vector<unsigned char>& data, string n);
 
     template<typename T>
     void readDataNumber(unsigned char* data, size_t& position, T& n);
     void readDataUChar(unsigned char* data, size_t& position, unsigned char& n);
-    void readDataString(unsigned char* data, size_t& position, string& n);
+    void readDataShortString(unsigned char* data, size_t& position, string& n);
 
 }
 

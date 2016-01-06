@@ -49,7 +49,7 @@ namespace Network{
     }
 
     bool sendData(TCPsocket* socket, vector<unsigned char>& data){
-        if (SDLNet_TCP_Send(*socket, static_cast<void*>(&data), (int)data.size()) < (int)data.size()) {
+        if (SDLNet_TCP_Send(*socket, &data[0], (int)data.size()) < (int)data.size()) {
 			fprintf(stderr, "SDLNet_TCP_Send: %s\n", SDLNet_GetError());
             return false;
 		}
@@ -64,17 +64,25 @@ namespace Network{
     }
 
     void finishPacket(vector<unsigned char>& data){
+
+        for(unsigned char d : data){
+            printf("d1 = %u\n", d);
+        }
+        printf("data.size() = %u\n", (PacketSize_t)data.size());
+
         union {
             PacketSize_t n;
             unsigned char b[sizeof(PacketSize_t)];
         } uBytes;
 
-        uBytes.n = data.size();
+        uBytes.n = (PacketSize_t)data.size();
         for (size_t i = 0; i < sizeof(PacketSize_t); i++) {
-            data[1+i] = (unsigned char) uBytes.b[i];
+            data[1+i] = uBytes.b[i];
         }
-        printf("data.size() = %zu\n", data.size());
-        printf("uBytes.n = %u\n", uBytes.n);
+
+        for(unsigned char d : data){
+            printf("d2 = %u\n", d);
+        }
     }
 
     int reciveData(TCPsocket* socket, unsigned char* data, PacketSize_t dataSize){
@@ -105,6 +113,39 @@ namespace Network{
         return 0;
     }
 
+    void recivePacket(TCPsocket* socket, function<void(int, unsigned char, unsigned char*)> process){
+
+        PacketSize_t s = 1+sizeof(PacketSize_t);
+        unsigned char data1[s];
+        int r = Network::reciveData(socket, data1, s);
+        if(r == 0){
+            process(0, 0, nullptr);
+        }else if(r == -1){
+            process(-1, 0, nullptr);
+        }else{
+            s = 0;
+
+            printf("data1[0] = %u", data1[0]);
+            for(size_t i = 0; i<sizeof(PacketSize_t); i++){
+                s |= data1[i+1] << (8*i);
+                printf("data1[%zu] = %u", i+1, data1[i+1]);
+            }
+
+            if(s > 0){
+                unsigned char data2[s];
+                int r = Network::reciveData(socket, data2, s);
+                if(r == 0){
+                    process(0, 0, nullptr);
+                }else if(r == -1){
+                    process(-1, 0, nullptr);
+                }else{
+                    process(r, data1[0], data2);
+                }
+            }else{
+                process(r, data1[0], nullptr);
+            }
+        }
+    }
 
 
 
@@ -127,10 +168,26 @@ namespace Network{
         data.push_back(n);
     }
 
-    void addDataString(vector<unsigned char>& data, string n){
-        addDataNumber(data, n.size());
-        for(char c : n){
-            data.push_back((unsigned char)c);
+    void addDataShortString(vector<unsigned char>& data, string n){
+        printf("string n = %s\n", n.c_str());
+        printf("n size = %zu\n", n.size());
+
+
+        for(unsigned char d : data){
+            printf("sd1 = %u\n", d);
+        }
+
+        addDataNumber(data, (unsigned short)n.size());
+
+        for(unsigned char d : data){
+            printf("sd2 = %u\n", d);
+        }
+
+        for(size_t i=0;i<n.size();i++){
+            data.push_back((unsigned char)n[i]);
+        }
+        for(unsigned char d : data){
+            printf("sd3 = %u\n", d);
         }
     }
 
@@ -158,9 +215,9 @@ namespace Network{
         position++;
     }
 
-    void readDataString(unsigned char* data, size_t& position, string& n){
+    void readDataShortString(unsigned char* data, size_t& position, string& n){
         n = "";
-        size_t ss;
+        unsigned short ss;
         readDataNumber(data, position, ss);
         for(size_t i = 0; i < ss; i++){
             char c = (char)data[position];

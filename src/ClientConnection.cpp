@@ -31,20 +31,10 @@ void ClientConnection::update(){
 
 int updateThread(void* data){
     ClientConnection* self = (ClientConnection*)data;
+
+
     while(self->connected){
-        size_t s = 1+sizeof(size_t);
-        unsigned char data1[s];
-        int r = Network::reciveData(self->socket, data1, s);
-        if(r == 0){
-            self->connected = false;
-            self->server->clientDisconnected(self, true);
-        }else if(r == -1){
-            self->connected = false;
-            self->server->clientDisconnected(self, false);
-        }else{
-            s = data1[1] & (data1[2] << 1) & (data1[3] << 2) & (data1[4] << 3);
-            unsigned char data2[s];
-            int r = Network::reciveData(self->socket, data2, s);
+        Network::recivePacket(self->socket, [self](int r, unsigned char code, unsigned char* data){
             if(r == 0){
                 self->connected = false;
                 self->server->clientDisconnected(self, true);
@@ -52,10 +42,11 @@ int updateThread(void* data){
                 self->connected = false;
                 self->server->clientDisconnected(self, false);
             }else{
-                self->server->processPacket(self, data1[0], data2);
+                self->server->processPacket(self, code, data);
             }
-        }
+        });
     }
+
     return 0;
 
 }

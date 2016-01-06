@@ -26,7 +26,7 @@ void Server::update(){
 
     //Remove disconnected clients
     while(clientRemoveList.size() > 0){
-        for(int i=0;i<clientList.size();i++){
+        for(size_t i=0;i<clientList.size();i++){
             if(clientList[i] == clientRemoveList[0]){
                 clientList.erase(clientList.begin() + i);
                 break;
@@ -81,11 +81,16 @@ void Server::clientDisconnected(ClientConnection* cc, bool intentional){
 
 void Server::processPacket(ClientConnection* from, unsigned char code, unsigned char* data){
     printf("Server recived code: %d\n", code);
+
     size_t position = 0;
     switch (code) {
         case PACKET_TS_USERNAME:{
-            Network::readDataString(data, position, from->username);
-            printf("Username set: %s\n", from->username.c_str());
+            if(data){
+                Network::readDataShortString(data, position, from->username);
+                printf("Username set: %s\n", from->username.c_str());
+            }else{
+                printf("data is nullptr\n");
+            }
             break;
         }
     }

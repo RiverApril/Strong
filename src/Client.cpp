@@ -8,45 +8,15 @@ void Client::update(){
 
     while(clientIsConnected){
 
-        printf("a\n");
-
-        PacketSize_t s = 1+sizeof(PacketSize_t);
-        unsigned char data1[s];
-        int r = Network::reciveData(socket, data1, s);
-        if(r == 0){
-            serverDisconnected(true);
-        }else if(r == -1){
-            serverDisconnected(false);
-        }else{
-
-            printf("b\n");
-
-            s = 0;
-
-            printf("s[%d] = %u\n", 0, data1[0]);
-            for(size_t i=0;i<sizeof(PacketSize_t);i++){
-                s |= (data1[i+1] << (8*i));
-                printf("s[%zu] = %u\n", i+1, data1[i+1]);
-            }
-            printf("s = %u\n", s);
-
-            if(s > 0){
-                unsigned char data2[s];
-                int r = Network::reciveData(socket, data2, s);
-                if(r == 0){
-                    serverDisconnected(true);
-                }else if(r == -1){
-                    serverDisconnected(false);
-                }else{
-
-                    printf("c\n");
-
-                    processPacket(data1[0], data2);
-                }
+        Network::recivePacket(socket, [this](int r, unsigned char code, unsigned char* data){
+            if(r == 0){
+                serverDisconnected(true);
+            }else if(r == -1){
+                serverDisconnected(false);
             }else{
-                processPacket(data1[0], nullptr);
+                processPacket(code, data);
             }
-        }
+        });
 
     }
 
@@ -85,6 +55,10 @@ void Client::connectToServer(){
 }
 
 void Client::connectToServer(string address, int port, string username){
+    this->address = address;
+    this->port = port;
+    this->username = username;
+
     if(clientIsConnected){
         printf("Client is already connected\n");
     }else{
@@ -129,7 +103,7 @@ void Client::sendPacket(unsigned char code){
 
     switch(code){
         case PACKET_TS_USERNAME:{
-            Network::addDataString(data, username);
+            Network::addDataShortString(data, username);
             break;
         }
     }
