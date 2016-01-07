@@ -1,17 +1,15 @@
 #include "Client.hpp"
 
 Client::Client(){
-    threadRecive = SDL_CreateThread(updateCThread, NULL, this);
+
 }
 
 int updateCThread(void* data){
     Client* self = (Client*)data;
 
-    printf("update thread\n");
-
     while(self->connected){
 
-        printf("about to try to recive packet\n");
+        printf("about to try to receive packet\n");
 
         Network::recivePacket(self->socket, [self](int r, unsigned char code, unsigned char* data){
             if(r == 0){
@@ -73,6 +71,7 @@ void Client::connectToServer(){
         bool success = Network::connectToHost(address, port, socket, ip);
         if(success){
             printf("Connected to server\n");
+            threadRecive = SDL_CreateThread(updateCThread, NULL, this);
         }else{
             printf("Failed to connect to server\n");
             connected = false;
