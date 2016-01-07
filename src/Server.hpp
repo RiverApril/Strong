@@ -24,7 +24,7 @@ public:
 
     void update();
     void startServer();
-    void startServer(int port);
+    void setPort(bool setPort);
 
     void clientDisconnected(ClientConnection* cc, bool intentional);
 

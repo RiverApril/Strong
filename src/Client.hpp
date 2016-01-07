@@ -7,12 +7,14 @@ class Client{
 public:
 
     bool running = true;
-    bool clientIsConnected = false;
+    bool connected = false;
 
     string address;
     int port;
 
     string username;
+
+    SDL_Thread* threadRecive;
 
     TCPsocket* socket = new TCPsocket();
     IPaddress* ip = new IPaddress();
@@ -22,13 +24,15 @@ public:
     ~Client(){}
 
     void update();
+    void setValues(bool setIp, bool setPort, bool setUsername);
     void connectToServer();
-    void connectToServer(string address, int port, string username);
 
     void serverDisconnected(bool intentional);
     void processPacket(unsigned char code, unsigned char* data);
     void sendPacket(unsigned char code);
 
 };
+
+int updateCThread(void* data);
 
 #endif

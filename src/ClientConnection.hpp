@@ -26,7 +26,7 @@ public:
 
 };
 
-int updateThread(void* data);
+int updateCCThread(void* data);
 
 #include "Server.hpp"
 

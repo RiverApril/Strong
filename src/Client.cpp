@@ -1,76 +1,81 @@
 #include "Client.hpp"
 
 Client::Client(){
-
+    threadRecive = SDL_CreateThread(updateCThread, NULL, this);
 }
 
-void Client::update(){
+int updateCThread(void* data){
+    Client* self = (Client*)data;
 
-    while(clientIsConnected){
+    printf("update thread\n");
 
-        Network::recivePacket(socket, [this](int r, unsigned char code, unsigned char* data){
+    while(self->connected){
+
+        printf("about to try to recive packet\n");
+
+        Network::recivePacket(self->socket, [self](int r, unsigned char code, unsigned char* data){
             if(r == 0){
-                serverDisconnected(true);
+                self->serverDisconnected(true);
             }else if(r == -1){
-                serverDisconnected(false);
+                self->serverDisconnected(false);
             }else{
-                processPacket(code, data);
+                self->processPacket(code, data);
             }
         });
 
     }
 
+    return 0;
 }
 
-void Client::connectToServer(){
-    while(true){
+void Client::update(){
+
+}
+
+void Client::setValues(bool setIp, bool setPort, bool setUsername){
+    while(setIp){
         printf("Enter IP address:\n");
         cin >> address;
         if(address.size() > 0){
-            break;
+            setIp = false;
         }else{
             printf("You must enter an Address\n");
         }
     }
-    while(true){
+    while(setPort){
         printf("Enter port:\n");
         cin >> port;
         if(port < 0 || port > 65535){
             printf("Port must be between 0 and 65535\n");
         }else{
-            break;
+            setPort = false;
         }
     }
-    while(true){
+    while(setUsername){
         printf("Enter Unsername:\n");
         cin >> username;
         if(username.size() > 0){
-            break;
+            setUsername = false;
         }else{
             printf("You must enter a Username\n");
         }
     }
-
-    connectToServer(address, port, username);
 }
 
-void Client::connectToServer(string address, int port, string username){
-    this->address = address;
-    this->port = port;
-    this->username = username;
+void Client::connectToServer(){
 
-    if(clientIsConnected){
+    if(connected){
         printf("Client is already connected\n");
     }else{
-        clientIsConnected = true;
-        printf("Connecting to server: %s:%d\n", address.c_str(), port);
+        connected = true;
+        printf("Connecting to server: %s:%d as \"%s\"\n", address.c_str(), port, username.c_str());
 
         bool success = Network::connectToHost(address, port, socket, ip);
         if(success){
             printf("Connected to server\n");
         }else{
             printf("Failed to connect to server\n");
-            clientIsConnected = false;
+            connected = false;
             return;
         }
     }
@@ -78,7 +83,7 @@ void Client::connectToServer(string address, int port, string username){
 
 void Client::serverDisconnected(bool intentional){
 	SDLNet_TCP_Close(*socket);
-    clientIsConnected = false;
+    connected = false;
     if(intentional){
         printf("Disconnected from server\n");
     }else{
@@ -88,7 +93,7 @@ void Client::serverDisconnected(bool intentional){
 
 void Client::processPacket(unsigned char code, unsigned char* data){
     printf("Client recived code: %d\n", code);
-    size_t position = 0;
+    //size_t position = 0;
     switch(code){
         case PACKET_TC_REQUEST_USERNAME:{
             sendPacket(PACKET_TS_USERNAME);

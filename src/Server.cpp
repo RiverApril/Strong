@@ -38,8 +38,8 @@ void Server::update(){
 
 }
 
-void Server::startServer(){
-    while(true){
+void Server::setPort(bool setPort){
+    while(setPort){
         printf("Enter host port:\n");
         cin >> port;
         if(port < 0 || port > 65535){
@@ -48,10 +48,9 @@ void Server::startServer(){
             break;
         }
     }
-    startServer(port);
 }
 
-void Server::startServer(int port){
+void Server::startServer(){
     if(serverIsStarted){
         printf("Server is already started\n");
     }else{

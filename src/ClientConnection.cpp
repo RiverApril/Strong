@@ -21,7 +21,7 @@ ClientConnection::ClientConnection(TCPsocket* hostSocket, TCPsocket* socket, Ser
 		fprintf(stderr, "SDLNet_TCP_GetPeerAddress: %s\n", SDLNet_GetError());
     }
 
-    threadRecive = SDL_CreateThread(updateThread, NULL, this);
+    threadRecive = SDL_CreateThread(updateCCThread, NULL, this);
 
 }
 
@@ -29,7 +29,7 @@ void ClientConnection::update(){
 
 }
 
-int updateThread(void* data){
+int updateCCThread(void* data){
     ClientConnection* self = (ClientConnection*)data;
 
 

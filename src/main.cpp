@@ -42,13 +42,11 @@ int main(int argc, char* argv[]){
     if(runServer){
         Server* server = new Server();
 
-        if(port != -1){
-            server->startServer(port);
-        }
+        server->port = port;
 
-        while(!server->serverIsStarted){
-            server->startServer();
-        }
+        server->setPort(port == -1);
+
+        server->startServer();
 
         while(server->running){
             server->update();
@@ -57,13 +55,13 @@ int main(int argc, char* argv[]){
         Graphics::init();
         Window* window = new Window();
 
-        if(address.size() != 0 && port != -1 && username.size() != 0){
-            window->client->connectToServer(address, port, username);
-        }
+        window->client->address = address;
+        window->client->port = port;
+        window->client->username = username;
 
-        while(!window->client->clientIsConnected){
-            window->client->connectToServer();
-        }
+        window->client->setValues(address.size() == 0, port == -1, username.size() == 0);
+
+        window->client->connectToServer();
 
         while(window->running){
             window->update();
