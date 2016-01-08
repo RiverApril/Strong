@@ -1,15 +1,28 @@
+//
+//  Client.cpp
+//  Strong
+//
+//  Created by Braeden Atlee on 1/7/16.
+//  Copyright © 2016 Braeden Atlee. All rights reserved.
+//
+
 #include "Client.hpp"
+#include "Settings.hpp"
 
 Client::Client(){
 
+}
+
+Client::~Client(){
+    if(connected){
+        serverDisconnected(true);
+    }
 }
 
 int updateCThread(void* data){
     Client* self = (Client*)data;
 
     while(self->connected){
-
-        printf("about to try to receive packet\n");
 
         Network::recivePacket(self->socket, [self](int r, unsigned char code, unsigned char* data){
             if(r == 0){
@@ -28,13 +41,18 @@ int updateCThread(void* data){
 
 void Client::update(){
 
+    if(!connected){
+        printf("Trying to reconnect...\n");
+        connectToServer();
+    }
+
 }
 
 void Client::setValues(bool setIp, bool setPort, bool setUsername){
     while(setIp){
         printf("Enter IP address:\n");
-        cin >> address;
-        if(address.size() > 0){
+        cin >> Settings::Client::connectAddress;
+        if(Settings::Client::connectAddress.size() > 0){
             setIp = false;
         }else{
             printf("You must enter an Address\n");
@@ -42,8 +60,8 @@ void Client::setValues(bool setIp, bool setPort, bool setUsername){
     }
     while(setPort){
         printf("Enter port:\n");
-        cin >> port;
-        if(port < 0 || port > 65535){
+        cin >> Settings::Client::connectPort;
+        if(Settings::Client::connectPort < 0 || Settings::Client::connectPort > 65535){
             printf("Port must be between 0 and 65535\n");
         }else{
             setPort = false;
@@ -51,8 +69,8 @@ void Client::setValues(bool setIp, bool setPort, bool setUsername){
     }
     while(setUsername){
         printf("Enter Unsername:\n");
-        cin >> username;
-        if(username.size() > 0){
+        cin >> Settings::Client::connectUsername;
+        if(Settings::Client::connectUsername.size() > 0){
             setUsername = false;
         }else{
             printf("You must enter a Username\n");
@@ -66,9 +84,9 @@ void Client::connectToServer(){
         printf("Client is already connected\n");
     }else{
         connected = true;
-        printf("Connecting to server: %s:%d as \"%s\"\n", address.c_str(), port, username.c_str());
+        printf("Connecting to server: %s:%d as \"%s\"\n", Settings::Client::connectAddress.c_str(), Settings::Client::connectPort, Settings::Client::connectUsername.c_str());
 
-        bool success = Network::connectToHost(address, port, socket, ip);
+        bool success = Network::connectToHost(Settings::Client::connectAddress, Settings::Client::connectPort, socket, ip);
         if(success){
             printf("Connected to server\n");
             threadRecive = SDL_CreateThread(updateCThread, NULL, this);
@@ -107,7 +125,7 @@ void Client::sendPacket(unsigned char code){
 
     switch(code){
         case PACKET_TS_USERNAME:{
-            Network::addDataShortString(data, username);
+            Network::addDataShortString(data, Settings::Client::connectUsername);
             break;
         }
     }

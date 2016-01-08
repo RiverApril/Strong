@@ -1,5 +1,13 @@
-#ifndef Strong_Global_hpp
-#define Strong_Global_hpp
+//
+//  Global.hpp
+//  Strong
+//
+//  Created by Braeden Atlee on 1/7/16.
+//  Copyright © 2016 Braeden Atlee. All rights reserved.
+//
+
+#ifndef Global_hpp
+#define Global_hpp
 
 
 #include <iostream>

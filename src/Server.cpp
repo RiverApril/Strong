@@ -1,4 +1,13 @@
+//
+//  Server.cpp
+//  Strong
+//
+//  Created by Braeden Atlee on 1/7/16.
+//  Copyright © 2016 Braeden Atlee. All rights reserved.
+//
+
 #include "Server.hpp"
+#include "Settings.hpp"
 
 
 Server::Server(){
@@ -13,8 +22,8 @@ void Server::update(){
     if(*clientSocket){
         ClientConnection* clientConnection = new ClientConnection(socket, clientSocket, this);
         clientList.push_back(clientConnection);
+        printf("Sending username request...\n");
         sendPacket(clientConnection, PACKET_TC_REQUEST_USERNAME);
-        printf("Sent username request\n");
     }else{
         delete clientSocket;
     }
@@ -41,8 +50,8 @@ void Server::update(){
 void Server::setPort(bool setPort){
     while(setPort){
         printf("Enter host port:\n");
-        cin >> port;
-        if(port < 0 || port > 65535){
+        cin >> Settings::Server::hostPort;
+        if(Settings::Server::hostPort < 0 || Settings::Server::hostPort > 65535){
             printf("Port must be between 0 and 65535\n");
         }else{
             break;
@@ -55,9 +64,9 @@ void Server::startServer(){
         printf("Server is already started\n");
     }else{
         serverIsStarted = true;
-        printf("Starting server on port: %d\n", port);
+        printf("Starting server on port: %d\n", Settings::Server::hostPort);
 
-        bool success = Network::initHost(port, socket, ip);
+        bool success = Network::initHost(Settings::Server::hostPort, socket, ip);
         if(success){
             printf("Server Started\n");
         }else{
@@ -96,6 +105,9 @@ void Server::processPacket(ClientConnection* from, unsigned char code, unsigned 
 }
 
 void Server::sendPacket(ClientConnection* to, unsigned char code){
+    while(to->sendLock);
+    to->sendLock = true;
+
     vector<unsigned char> data;
     Network::initPacket(data, code);
 
@@ -107,4 +119,6 @@ void Server::sendPacket(ClientConnection* to, unsigned char code){
 
     Network::finishPacket(data);
     Network::sendData(to->socket, data);
+
+    to->sendLock = false;
 }

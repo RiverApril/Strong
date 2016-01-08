@@ -1,5 +1,13 @@
-#ifndef Strong_Client_hpp
-#define Strong_Client_hpp
+//
+//  Client.hpp
+//  Strong
+//
+//  Created by Braeden Atlee on 1/7/16.
+//  Copyright © 2016 Braeden Atlee. All rights reserved.
+//
+
+#ifndef Client_hpp
+#define Client_hpp
 
 #include "Network.hpp"
 
@@ -9,11 +17,6 @@ public:
     bool running = true;
     bool connected = false;
 
-    string address;
-    int port;
-
-    string username;
-
     SDL_Thread* threadRecive;
 
     TCPsocket* socket = new TCPsocket();
@@ -21,7 +24,7 @@ public:
 
     Client();
 
-    ~Client(){}
+    ~Client();
 
     void update();
     void setValues(bool setIp, bool setPort, bool setUsername);

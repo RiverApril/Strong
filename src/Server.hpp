@@ -1,5 +1,13 @@
-#ifndef Strong_Server_hpp
-#define Strong_Server_hpp
+//
+//  Server.hpp
+//  Strong
+//
+//  Created by Braeden Atlee on 1/7/16.
+//  Copyright © 2016 Braeden Atlee. All rights reserved.
+//
+
+#ifndef Server_hpp
+#define Server_hpp
 
 #include "Network.hpp"
 #include "ClientConnection.hpp"
@@ -9,8 +17,6 @@ public:
 
     bool running = true;
     bool serverIsStarted = false;
-
-    int port;
 
     TCPsocket* socket = new TCPsocket();
     IPaddress* ip = new IPaddress();

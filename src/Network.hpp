@@ -1,15 +1,23 @@
-#ifndef Strong_Network_hpp
-#define Strong_Network_hpp
+//
+//  Network.hpp
+//  Strong
+//
+//  Created by Braeden Atlee on 1/7/16.
+//  Copyright © 2016 Braeden Atlee. All rights reserved.
+//
+
+#ifndef Network_hpp
+#define Network_hpp
 
 #include "Global.hpp"
 #include <SDL2/SDL_net.h>
 #include <SDL2/SDL_thread.h>
 
 //To client from server:
-#define PACKET_TC_REQUEST_USERNAME 12
+#define PACKET_TC_REQUEST_USERNAME 0
 
 //To server from client:
-#define PACKET_TS_USERNAME 34
+#define PACKET_TS_USERNAME 0
 
 typedef unsigned short PacketSize_t;
 

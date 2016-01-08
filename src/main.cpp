@@ -1,8 +1,17 @@
+//
+//  main.cpp
+//  Strong
+//
+//  Created by Braeden Atlee on 1/7/16.
+//  Copyright © 2016 Braeden Atlee. All rights reserved.
+//
+
 #include "Global.hpp"
 #include "Server.hpp"
 #include "Client.hpp"
 #include "Window.hpp"
 #include "Graphics.hpp"
+#include "Settings.hpp"
 
 int main(int argc, char* argv[]){
 
@@ -25,7 +34,7 @@ int main(int argc, char* argv[]){
             port = stoi(argv[2]);
         }else{
             string s = string(argv[2]);
-            int i = s.find(':');
+            size_t i = s.find(':');
             address = s.substr(0, i);
             port = stoi(s.substr(i+1));
         }
@@ -42,9 +51,15 @@ int main(int argc, char* argv[]){
     if(runServer){
         Server* server = new Server();
 
-        server->port = port;
+        Settings::loadSettings(true);
 
-        server->setPort(port == -1);
+        if(port != -1){
+        	Settings::Server::hostPort = port;
+        }
+
+        server->setPort(Settings::Server::hostPort == -1);
+
+        Settings::saveSettings(true);
 
         server->startServer();
 
@@ -55,11 +70,21 @@ int main(int argc, char* argv[]){
         Graphics::init();
         Window* window = new Window();
 
-        window->client->address = address;
-        window->client->port = port;
-        window->client->username = username;
+        Settings::loadSettings(false);
 
-        window->client->setValues(address.size() == 0, port == -1, username.size() == 0);
+        if(address.size() != 0){
+            Settings::Client::connectAddress = address;
+        }
+        if(port != -1){
+            Settings::Client::connectPort = port;
+        }
+        if(username.size() != 0){
+            Settings::Client::connectUsername = username;
+        }
+
+        window->client->setValues(Settings::Client::connectAddress.size() == 0, Settings::Client::connectPort == -1, Settings::Client::connectUsername.size() == 0);
+
+        Settings::saveSettings(false);
 
         window->client->connectToServer();
 
