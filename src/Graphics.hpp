@@ -11,12 +11,34 @@
 
 #include "Global.hpp"
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+
+class Image;
+class Window;
 
 namespace Graphics{
+
+    extern Image* imageGui;
+
+    extern TTF_Font* fontSmall;
     
     void init();
     void cleanup();
+
+    SDL_Rect* newRect(int x, int y, int w, int h);
+
+    void loadImages(Window* window);
+    Image* loadImage(Window* window, string path);
+    TTF_Font* loadFont(Window* window, string path, int size);
+    void makeClips(Image* img, int clipW, int clipH);
+
+    void drawImage(Window* window, int x, int y, int w, int h, Image* img, SDL_Rect* clip);
+    
+    void makeImageFromText(Window* window, string text, Image* img, TTF_Font* font, SDL_Color color);
     
 }
+
+#include "Image.hpp"
+#include "Window.hpp"
 
 #endif

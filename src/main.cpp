@@ -86,7 +86,7 @@ int main(int argc, char* argv[]){
 
         Settings::saveSettings(false);
 
-        window->client->connectToServer();
+        //window->client->connectToServer();
 
         while(window->running){
             window->update();

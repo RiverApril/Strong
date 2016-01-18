@@ -17,7 +17,7 @@ class Menu;
 class UiObject{
 public:
     
-    UiObject(Menu* menu);
+    UiObject();
 
     virtual ~UiObject();
 
@@ -34,6 +34,8 @@ public:
     virtual bool keyPressed(SDL_Keysym key);
 
     virtual bool keyReleased(SDL_Keysym key);
+
+    virtual void windowResized();
 
     virtual void update();
 

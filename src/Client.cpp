@@ -41,10 +41,10 @@ int updateCThread(void* data){
 
 void Client::update(){
 
-    if(!connected){
+    /*if(!connected){
         printf("Trying to reconnect...\n");
         connectToServer();
-    }
+    }*/
 
 }
 

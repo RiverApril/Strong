@@ -7,6 +7,7 @@
 //
 
 #include "Window.hpp"
+#include "UiButton.hpp"
 
 Window::Window(){
     client = new Client();
@@ -17,14 +18,19 @@ Window::Window(){
         running = false;
     }
 
-    sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, 0);
+    sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
     if(!sdlRenderer){
         fprintf(stderr, "SDL_CreateRenderer: %s\n", SDL_GetError());
         running = false;
     }
 
-    SDL_RenderClear(sdlRenderer);
-    SDL_RenderPresent(sdlRenderer);
+
+    Graphics::loadImages(this);
+
+    currentMenu = new Menu(this);
+    currentMenu->addUiObject(new UiButton(20, 50, "Connect to server", [](UiButton* uio){
+        uio->menu->window->client->connectToServer();
+    }));
 }
 
 Window::~Window(){
@@ -36,12 +42,14 @@ void Window::update(){
 
     processEvents();
 
+    SDL_RenderClear(sdlRenderer);
+
     if(currentMenu){
     	currentMenu->update();
-    	currentMenu->render(this);
+    	currentMenu->render();
     }
 
-    SDL_UpdateWindowSurface(sdlWindow);
+    SDL_RenderPresent(sdlRenderer);
 }
 
 void Window::processEvents(){
@@ -83,14 +91,14 @@ void Window::processEvents(){
 
             case SDL_MOUSEBUTTONDOWN:{
                 if(currentMenu){
-                    currentMenu->mouseDown(inputEvent.button.button, inputEvent.button.x, inputEvent.button.y);
+                    currentMenu->mouseDown(inputEvent.button.x, inputEvent.button.y, inputEvent.button.button);
                 }
                 break;
             }
 
             case SDL_MOUSEBUTTONUP:{
                 if(currentMenu){
-                    currentMenu->mouseDown(inputEvent.button.button, inputEvent.button.x, inputEvent.button.y);
+                    currentMenu->mouseUp(inputEvent.button.x, inputEvent.button.y, inputEvent.button.button);
                 }
                 break;
             }
@@ -100,6 +108,10 @@ void Window::processEvents(){
                     case SDL_WINDOWEVENT_RESIZED:
                         width = inputEvent.window.data1;
                         height = inputEvent.window.data2;
+                        SDL_RenderSetLogicalSize(sdlRenderer, width, height);
+                        if(currentMenu){
+                            currentMenu->windowResized();
+                        }
                         break;
                         
                     default:

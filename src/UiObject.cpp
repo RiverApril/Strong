@@ -9,8 +9,8 @@
 #include "UiObject.hpp"
 
 
-UiObject::UiObject(Menu* menu){
-    this->menu = menu;
+UiObject::UiObject(){
+
 }
 
 UiObject::~UiObject(){
@@ -43,6 +43,10 @@ bool UiObject::keyPressed(SDL_Keysym key){
 
 bool UiObject::keyReleased(SDL_Keysym key){
     return false;
+}
+
+void UiObject::windowResized(){
+
 }
 
 void UiObject::update(){

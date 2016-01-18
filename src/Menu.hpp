@@ -35,9 +35,11 @@ public:
 
     virtual bool keyReleased(SDL_Keysym key);
 
+    virtual void windowResized();
+
     virtual void update();
 
-    virtual void render(Window* window);
+    virtual void render();
 
     vector<UiObject*> uiObjectList;
 

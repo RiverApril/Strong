@@ -17,6 +17,7 @@ Menu::~Menu(){
 }
 
 void Menu::addUiObject(UiObject* uio){
+    uio->menu = this;
     uio->uID = nextUID;
     nextUID++;
     uiObjectList.push_back(uio);
@@ -95,6 +96,10 @@ bool Menu::keyReleased(SDL_Keysym key){
     return false;
 }
 
+void Menu::windowResized(){
+
+}
+
 void Menu::update(){
     for(UiObject* o : uiObjectList){
         if(o->enabled){
@@ -103,7 +108,7 @@ void Menu::update(){
     }
 }
 
-void Menu::render(Window* window){
+void Menu::render(){
     for(UiObject* o : uiObjectList){
         if(o->enabled && o->visable){
             o->render();
