@@ -40,7 +40,7 @@ public:
     bool mustUpdateText;
     SDL_Color textColor = {255, 255, 255, 255};
     int textW, textH;
-    function<void(UiButton*)> click;
+    function<void(UiButton*)> onClick;
 
     Image* image = Graphics::imageGui;
     SDL_Rect* clipDefault = Graphics::newRect(0, 0, 12, 12);

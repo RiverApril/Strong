@@ -7,8 +7,9 @@
 //
 
 #include "Window.hpp"
-#include "UiButton.hpp"
-#include "UiTextBox.hpp"
+#include "MenuMain.hpp"
+#include "Graphics.hpp"
+#include "Settings.hpp"
 
 Window::Window(){
     client = new Client();
@@ -27,12 +28,19 @@ Window::Window(){
 
 
     Graphics::loadImages(this);
+    
+    changeMenu(new MenuMain(this), true);
+}
 
-    currentMenu = new Menu(this);
-    currentMenu->addUiObject(new UiButton(20, 20, "Connect to server", [](UiButton* uio){
-        uio->menu->window->client->connectToServer();
-    }));
-    currentMenu->addUiObject(new UiTextBox(20, 50, "localhost"));
+void Window::changeMenu(Menu* nextMenu, bool deleteOld){
+    if(currentMenu){
+        currentMenu->closeMenu();
+        if(deleteOld){
+        	delete currentMenu;
+        }
+    }
+    currentMenu = nextMenu;
+    currentMenu->openMenu();
 }
 
 Window::~Window(){
@@ -75,6 +83,12 @@ void Window::processEvents(){
                     currentMenu->keyReleased(inputEvent.key.keysym);
                 }
                 break;
+            }
+
+            case SDL_TEXTINPUT:{
+                if(currentMenu){
+                    currentMenu->textInput(inputEvent.text.text);
+                }
             }
 
             case SDL_MOUSEMOTION:{

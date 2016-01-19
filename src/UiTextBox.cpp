@@ -10,11 +10,11 @@
 #include "Graphics.hpp"
 
 
-UiTextBox::UiTextBox(int x, int y, string text) : UiTextBox(x, y, 100, 20, text){
+UiTextBox::UiTextBox(int x, int y, string text, function<void(UiTextBox*)> onEnter, function<void(UiTextBox*)> onChange) : UiTextBox(x, y, 100, 20, text, onEnter, onChange){
     fitToText = true;
 }
 
-UiTextBox::UiTextBox(int x, int y, int w, int h, string text) : UiObject(){
+UiTextBox::UiTextBox(int x, int y, int w, int h, string text, function<void(UiTextBox*)> onEnter, function<void(UiTextBox*)> onChange) : UiObject(){
     this->x = x;
     this->y = y;
 
@@ -22,6 +22,9 @@ UiTextBox::UiTextBox(int x, int y, int w, int h, string text) : UiObject(){
     heightMin = h;
 
     this->text = text;
+
+    this->onEnter = onEnter;
+    this->onChange = onChange;
 
     mustUpdateText = true;
 }
@@ -36,6 +39,9 @@ void UiTextBox::changeText(string newText, bool force){
     if(force || text.compare(newText) != 0){
         text = newText;
         mustUpdateText = true;
+        if(onChange){
+            onChange(this);
+        }
     }
 }
 
@@ -62,39 +68,26 @@ bool UiTextBox::mouseDown(int x, int y, int button){
 
 bool UiTextBox::keyPressed(SDL_Keysym key){
     if(focused){
-        SDL_Keycode c = key.sym;
-        if(key.mod & (KMOD_SHIFT | KMOD_CAPS)){
-            if(c >= 'a' && c <= 'z'){
-                c += 'A'-'a';
-            }
-        }
-        if((inputMask & ENABLE_LOWERCASE) && c >= 'a' && c <= 'z'){
-            changeText(text+(char)c);
-            return true;
-        }
-        if((inputMask & ENABLE_UPERCASE) && c >= 'A' && c <= 'Z'){
-            changeText(text+(char)c);
-            return true;
-        }
-        if((inputMask & ENABLE_NUMEBRS) && c >= '0' && c <= '9'){
-            changeText(text+(char)c);
-            return true;
-        }
-        if((inputMask & ENABLE_SPACES) && c == ' '){
-            changeText(text+(char)c);
-            return true;
-        }
-        if((inputMask & ENABLE_PERIODS) && c == '.'){
-            changeText(text+(char)c);
-            return true;
-        }
         if(key.sym == SDLK_BACKSPACE){
-            if(text.length() > 0){
-                changeText(text.substr(0, text.length()-1));
+            if(text.size() > 0){
+        		changeText(text.substr(0, text.size()-1));
+            }
+        	return true;
+        }else if(key.sym == SDLK_RETURN){
+            if(onEnter){
+            	onEnter(this);
             }
             return true;
         }
-        return false;
+    }
+    return false;
+}
+
+
+bool UiTextBox::textInput(string s){
+    if(focused){
+        changeText(text+s);
+        return true;
     }
     return false;
 }

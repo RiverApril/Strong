@@ -27,6 +27,8 @@ namespace Graphics{
             fprintf(stderr, "TTF_Init: %s\n", SDL_GetError());
             exit(EXIT_FAILURE);
         }
+
+        SDL_StartTextInput();
     }
     
     void cleanup(){
@@ -50,7 +52,7 @@ namespace Graphics{
 
         imageGui = loadImage(window, "img/gui.png");
 
-        fontSmall = loadFont(window, "img/Arial.ttf", 12);
+        fontSmall = loadFont(window, "img/font.ttf", 12);
 
     }
 
@@ -186,7 +188,7 @@ namespace Graphics{
 
     void makeImageFromText(Window* window, string text, Image* img, TTF_Font* font, SDL_Color color){
         if(img){
-            SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), color);
+            SDL_Surface* surface = TTF_RenderText_Blended(font, text.c_str(), color);
             if(surface){
                 SDL_Texture* texture = SDL_CreateTextureFromSurface(window->sdlRenderer, surface);
                 SDL_FreeSurface(surface);

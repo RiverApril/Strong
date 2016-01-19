@@ -10,17 +10,17 @@
 #include "Graphics.hpp"
 
 
-UiButton::UiButton(int x, int y, string text, function<void(UiButton*)> click) : UiButton(x, y, 100, 20, text, click){
+UiButton::UiButton(int x, int y, string text, function<void(UiButton*)> onClick) : UiButton(x, y, 100, 20, text, onClick){
     fitToText = true;
 }
 
-UiButton::UiButton(int x, int y, int w, int h, string text, function<void(UiButton*)> click) : UiObject(){
+UiButton::UiButton(int x, int y, int w, int h, string text, function<void(UiButton*)> onClick) : UiObject(){
     this->x = x;
     this->y = y;
     this->w = w;
     this->h = h;
     this->text = text;
-    this->click = click;
+    this->onClick = onClick;
 
     mustUpdateText = true;
 }
@@ -63,7 +63,7 @@ bool UiButton::mouseUp(int x, int y, int button){
     if(contains(x, y)){
         if(button == SDL_BUTTON_LEFT && clickedDown){
             clickedDown = false;
-            click(this);
+            onClick(this);
             return true;
         }
     }

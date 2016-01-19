@@ -16,6 +16,14 @@ Menu::~Menu(){
 
 }
 
+void Menu::openMenu(){
+
+}
+
+void Menu::closeMenu(){
+
+}
+
 void Menu::addUiObject(UiObject* uio){
     uio->menu = this;
     uio->uID = nextUID;
@@ -95,6 +103,17 @@ bool Menu::keyReleased(SDL_Keysym key){
     for(UiObject* o : uiObjectList){
         if(o->enabled && o->focused){
             if(o->keyReleased(key)){
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool Menu::textInput(string s){
+    for(UiObject* o : uiObjectList){
+        if(o->enabled && o->focused){
+            if(o->textInput(s)){
                 return true;
             }
         }

@@ -33,6 +33,8 @@ public:
 
     
     Window();
+
+    void changeMenu(Menu* nextMenu, bool deleteOld);
     
     ~Window();
     

@@ -19,6 +19,10 @@ public:
     
     virtual ~Menu();
 
+    virtual void openMenu();
+
+    virtual void closeMenu();
+
     void addUiObject(UiObject* uio);
 
     void setFocused(UiObject* uio);
@@ -34,6 +38,8 @@ public:
     virtual bool keyPressed(SDL_Keysym key);
 
     virtual bool keyReleased(SDL_Keysym key);
+
+    virtual bool textInput(string s);
 
     virtual void windowResized();
 

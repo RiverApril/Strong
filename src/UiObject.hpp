@@ -35,6 +35,8 @@ public:
 
     virtual bool keyReleased(SDL_Keysym key);
 
+    virtual bool textInput(string text);
+
     virtual void windowResized();
 
     virtual void update();

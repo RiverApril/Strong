@@ -45,6 +45,10 @@ bool UiObject::keyReleased(SDL_Keysym key){
     return false;
 }
 
+bool UiObject::textInput(string s){
+    return false;
+}
+
 void UiObject::windowResized(){
 
 }

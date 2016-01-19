@@ -16,13 +16,13 @@
 #define ENABLE_UPERCASE (1 << 1)
 #define ENABLE_NUMEBRS (1 << 2)
 #define ENABLE_SPACES (1 << 3)
-#define ENABLE_PERIODS (1 << 4)
+#define ENABLE_SYMBOLS (1 << 4)
 
 class UiTextBox : public UiObject {
 public:
 
-    UiTextBox(int x, int y, string text);
-    UiTextBox(int x, int y, int w, int h, string text);
+    UiTextBox(int x, int y, string text, function<void(UiTextBox*)> onEnter, function<void(UiTextBox*)> onChange);
+    UiTextBox(int x, int y, int w, int h, string text, function<void(UiTextBox*)> onEnter, function<void(UiTextBox*)> onChange);
 
     virtual ~UiTextBox();
 
@@ -32,13 +32,18 @@ public:
 
     virtual bool keyPressed(SDL_Keysym key);
 
+    virtual bool textInput(string s);
+
     virtual void render();
 
     virtual void changeText(string newText, bool force = false);
 
     virtual void focusChanged();
 
-    unsigned inputMask = ENABLE_LOWERCASE | ENABLE_UPERCASE | ENABLE_NUMEBRS | ENABLE_SPACES | ENABLE_PERIODS;
+    unsigned inputMask = ENABLE_LOWERCASE | ENABLE_UPERCASE | ENABLE_NUMEBRS | ENABLE_SPACES | ENABLE_SYMBOLS;
+
+    function<void(UiTextBox*)> onEnter = nullptr;
+    function<void(UiTextBox*)> onChange = nullptr;
 
     bool fitToText = false;
     int padding = 4;
