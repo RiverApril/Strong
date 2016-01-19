@@ -25,9 +25,15 @@ void Menu::addUiObject(UiObject* uio){
 
 void Menu::setFocused(UiObject* uio){
     for(UiObject* o : uiObjectList){
-        o->focused = false;
+        if(o->focused){
+            o->focused = false;
+            o->focusChanged();
+        }
     }
-    uio->focused = true;
+    if(!uio->focused){
+    	uio->focused = true;
+    	uio->focusChanged();
+    }
 }
 
 bool Menu::mouseMove(int x, int y){

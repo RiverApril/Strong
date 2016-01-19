@@ -33,6 +33,7 @@ namespace Graphics{
     void makeClips(Image* img, int clipW, int clipH);
 
     void drawImage(Window* window, int x, int y, int w, int h, Image* img, SDL_Rect* clip);
+    void drawStretchableBox(Window* window, int x, int y, int w, int h, Image* img, SDL_Rect* clip);
     
     void makeImageFromText(Window* window, string text, Image* img, TTF_Font* font, SDL_Color color);
     

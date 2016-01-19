@@ -43,9 +43,10 @@ public:
     function<void(UiButton*)> click;
 
     Image* image = Graphics::imageGui;
+    SDL_Rect* clipDefault = Graphics::newRect(0, 0, 12, 12);
+    SDL_Rect* clipHover = Graphics::newRect(12, 0, 12, 12);
+
     Image* imageText = new Image();
-    SDL_Rect* clipDefault = Graphics::newRect(0, 0, 16, 16);
-    SDL_Rect* clipHover = Graphics::newRect(16, 0, 16, 16);
 };
 
 #endif /* UiButton_hpp */

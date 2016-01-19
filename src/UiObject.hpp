@@ -41,6 +41,8 @@ public:
 
     virtual void render();
 
+    virtual void focusChanged();
+
 
     int x, y, w, h;
 

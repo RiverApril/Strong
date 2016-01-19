@@ -57,3 +57,7 @@ void UiObject::render(){
 
 }
 
+void UiObject::focusChanged(){
+    
+}
+

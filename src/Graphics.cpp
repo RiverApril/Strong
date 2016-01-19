@@ -50,7 +50,7 @@ namespace Graphics{
 
         imageGui = loadImage(window, "img/gui.png");
 
-        fontSmall = loadFont(window, "img/Arial.ttf", 16);
+        fontSmall = loadFont(window, "img/Arial.ttf", 12);
 
     }
 
@@ -93,6 +93,95 @@ namespace Graphics{
         r.w = w;
         r.h = h;
         SDL_RenderCopy(window->sdlRenderer, img->sdlTexture, clip, &r);
+    }
+
+    void drawStretchableBox(Window* window, int x, int y, int w, int h, Image* img, SDL_Rect* clip){
+        SDL_Rect r;
+
+        SDL_Rect rr;
+        rr.w = clip->w/3;
+        rr.h = clip->h/3;
+
+        //Top Left
+        rr.x = clip->x;
+        rr.y = clip->y;
+        r.x = x;
+        r.y = y;
+        r.w = rr.w;
+        r.h = rr.h;
+        SDL_RenderCopy(window->sdlRenderer, img->sdlTexture, &rr, &r);
+
+        //Top Middle
+        rr.x = clip->x+rr.w;
+        rr.y = clip->y;
+        r.x = x+rr.w;
+        r.y = y;
+        r.w = w-(rr.w*2);
+        r.h = rr.h;
+        SDL_RenderCopy(window->sdlRenderer, img->sdlTexture, &rr, &r);
+
+        //Top Right
+        rr.x = clip->x+(rr.w*2);
+        rr.y = clip->y;
+        r.x = x+w-rr.w;
+        r.y = y;
+        r.w = rr.w;
+        r.h = rr.h;
+        SDL_RenderCopy(window->sdlRenderer, img->sdlTexture, &rr, &r);
+
+        //Middle Left
+        rr.x = clip->x;
+        rr.y = clip->y+rr.h;
+        r.x = x;
+        r.y = y+rr.h;
+        r.w = rr.w;
+        r.h = h-(rr.h*2);
+        SDL_RenderCopy(window->sdlRenderer, img->sdlTexture, &rr, &r);
+
+        //Middle Middle
+        rr.x = clip->x+rr.w;
+        rr.y = clip->y+rr.h;
+        r.x = x+rr.w;
+        r.y = y+rr.h;
+        r.w = w-(rr.w*2);
+        r.h = h-(rr.h*2);
+        SDL_RenderCopy(window->sdlRenderer, img->sdlTexture, &rr, &r);
+
+        //Middle Right
+        rr.x = clip->x+(rr.w*2);
+        rr.y = clip->y+rr.h;
+        r.x = x+w-rr.w;
+        r.y = y+rr.h;
+        r.w = rr.w;
+        r.h = h-(rr.h*2);
+        SDL_RenderCopy(window->sdlRenderer, img->sdlTexture, &rr, &r);
+
+        //Bottom Left
+        rr.x = clip->x;
+        rr.y = clip->y+(rr.h*2);
+        r.x = x;
+        r.y = y+h-rr.h;
+        r.w = rr.w;
+        r.h = rr.h;
+        SDL_RenderCopy(window->sdlRenderer, img->sdlTexture, &rr, &r);
+
+        //Bottom Middle
+        rr.x = clip->x+rr.w;
+        rr.y = clip->y+(rr.h*2);
+        r.x = x+rr.w;
+        r.y = y+h-rr.h;
+        r.w = w-(rr.w*2);
+        r.h = rr.h;
+        SDL_RenderCopy(window->sdlRenderer, img->sdlTexture, &rr, &r);
+
+        //Bottom Right
+        rr.x = clip->x+(rr.w*2);
+        rr.y = clip->y+(rr.h*2);
+        r.x = x+w-rr.w;
+        r.y = y+h-rr.h;
+        r.w = rr.w;
+        r.h = rr.h;
+        SDL_RenderCopy(window->sdlRenderer, img->sdlTexture, &rr, &r);
     }
 
     void makeImageFromText(Window* window, string text, Image* img, TTF_Font* font, SDL_Color color){

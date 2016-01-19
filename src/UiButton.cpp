@@ -10,7 +10,7 @@
 #include "Graphics.hpp"
 
 
-UiButton::UiButton(int x, int y, string text, function<void(UiButton*)> click) : UiButton(x, y, 0, 0, text, click){
+UiButton::UiButton(int x, int y, string text, function<void(UiButton*)> click) : UiButton(x, y, 100, 20, text, click){
     fitToText = true;
 }
 
@@ -28,6 +28,7 @@ UiButton::UiButton(int x, int y, int w, int h, string text, function<void(UiButt
 UiButton::~UiButton(){
     delete clipDefault;
     delete clipHover;
+    delete imageText;
 }
 
 void UiButton::changeText(string newText, bool force){
@@ -81,7 +82,7 @@ void UiButton::render(){
         }
     }
 
-    Graphics::drawImage(menu->window, x, y, w, h, image, hover?clipHover:clipDefault);
+    Graphics::drawStretchableBox(menu->window, x, y, w, h, image, hover?clipHover:clipDefault);
     Graphics::drawImage(menu->window, x+padding, y+padding, textW, textH, imageText, NULL);
 
 }
