@@ -17,3 +17,10 @@ Debug/
 
 #Xcode:
 Strong.xcodeproj/
+
+#Atom:
+.tags
+.tags1
+
+#Dlls
+*.dll

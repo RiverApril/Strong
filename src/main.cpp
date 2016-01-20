@@ -68,7 +68,6 @@ int main(int argc, char* argv[]){
         }
     }else{
         Graphics::init();
-        Window* window = new Window();
 
         Settings::loadSettings(false);
 
@@ -81,8 +80,11 @@ int main(int argc, char* argv[]){
         if(username.size() != 0){
             Settings::Client::connectUsername = username;
         }
+        
+        
+        Window* window = new Window();
 
-        window->client->setValues(Settings::Client::connectAddress.size() == 0, Settings::Client::connectPort == -1, Settings::Client::connectUsername.size() == 0);
+        //window->client->setValues(Settings::Client::connectAddress.size() == 0, Settings::Client::connectPort == -1, Settings::Client::connectUsername.size() == 0);
 
         Settings::saveSettings(false);
 

@@ -75,21 +75,26 @@ if args.windows:
         compiler = "i686-w64-mingw32-c++"
         compilerFlags += " -D WIN32"
 
-    libraryFlags = "-lSDL2main -lSDL2 -lSDL2_image -lSDL2_net"
+    libraryFlags = "-lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_net -lSDL2_ttf -lSDL2_mixer"
     print("    # The Windows executable will require the following dll files:")
     print("    #   SDL2.dll")
     print("    #   SDL2_image.dll")
+    print("    #   SDL2_mixer.dll")
     print("    #   SDL2_net.dll")
+    print("    #   SDL2_ttf.dll")
     print("    #   zlib1.dll")
     print("    #   libpng16-16.dll")
+    print("    #   libfreetype-6.dll")
+    
+    libraryFlags += " -static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++ -lpthread -Wl,-Bdynamic"
 else:
     if systemName == "Darwin":
         compilerFlags += " -I/usr/local/include"
-        libraryFlags = "-L/usr/local/lib `sdl2-config --cflags` -lSDL2_image -lSDL2_net"
+        libraryFlags = "-L/usr/local/lib `sdl2-config --cflags` -lSDL2_image -lSDL2_net -lSDL2_ttf -lSDL2_mixer"
         libraryFlags += " `sdl2-config --libs`"
     elif systemName == "Linux":
         compilerFlags += " `sdl2-config --cflags`"
-        libraryFlags  = " `sdl2-config --libs` -lSDL2_image -lSDL2_net"
+        libraryFlags  = " `sdl2-config --libs` -lSDL2_image -lSDL2_net -lSDL2_ttf -lSDL2_mixer"
 
 if args.windows:
     executableName += "_Windows.exe"

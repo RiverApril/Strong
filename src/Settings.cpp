@@ -76,9 +76,9 @@ namespace Settings {
     }
 
     namespace Client {
-        string connectAddress = "";
-        int connectPort = -1;
-        string connectUsername = "";
+        string connectAddress = "localhost";
+        int connectPort = 1337;
+        string connectUsername = "username";
 
         vector<Setting*> settingList = {
             new SettingString("IP Address", &connectAddress),

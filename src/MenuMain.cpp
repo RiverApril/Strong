@@ -20,7 +20,7 @@ MenuMain::MenuMain(Window* window) : Menu(window){
     });
 
 
-    textAddress = new UiTextBox(20, 50, "localhost", [this](UiTextBox* uio){
+    textAddress = new UiTextBox(20, 50, Settings::Client::connectAddress+":"+to_string(Settings::Client::connectPort), [this](UiTextBox* uio){
         buttonConnect->onClick(buttonConnect);
     }, [this](UiTextBox* uio){
         string s = uio->text;
@@ -40,7 +40,7 @@ MenuMain::MenuMain(Window* window) : Menu(window){
         }
     });
 
-    textUsername = new UiTextBox(20, 80, "username", nullptr, [](UiTextBox* uio){
+    textUsername = new UiTextBox(20, 80, Settings::Client::connectUsername, nullptr, [](UiTextBox* uio){
         Settings::Client::connectUsername = uio->text;
     });
 
