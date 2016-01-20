@@ -7,6 +7,7 @@
 //
 
 #include "ClientConnection.hpp"
+#include "Server.hpp"
 
 
 ClientConnection::ClientConnection(TCPsocket* hostSocket, TCPsocket* socket, Server* server){
@@ -34,7 +35,7 @@ ClientConnection::ClientConnection(TCPsocket* hostSocket, TCPsocket* socket, Ser
 }
 
 void ClientConnection::update(){
-
+    
 }
 
 int updateCCThread(void* data){

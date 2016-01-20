@@ -8,9 +8,10 @@
 
 #include "Client.hpp"
 #include "Settings.hpp"
+#include "World.hpp"
 
 Client::Client(){
-
+    world = new World(this);
 }
 
 Client::~Client(){
@@ -40,12 +41,7 @@ int updateCThread(void* data){
 }
 
 void Client::update(){
-
-    /*if(!connected){
-        printf("Trying to reconnect...\n");
-        connectToServer();
-    }*/
-
+    world->update();
 }
 
 void Client::setValues(bool setIp, bool setPort, bool setUsername){
@@ -110,13 +106,22 @@ void Client::serverDisconnected(bool intentional){
 
 void Client::processPacket(unsigned char code, unsigned char* data){
     printf("Client recived code: %d\n", code);
-    //size_t position = 0;
+    size_t* position = new size_t(0);
     switch(code){
-        case PACKET_TC_REQUEST_USERNAME:{
-            sendPacket(PACKET_TS_USERNAME);
+        case PACKET_TC_REQUEST_CLIENT_INFO:{
+            sendPacket(PACKET_TS_CLIENT_INFO);
+            break;
+        }
+        case PACKET_TC_ALL_WORLD_DATA:{
+            world->readData(data, *position);
+            break;
+        }
+        case PACKET_TC_NEW_GENERAL:{
+            world->newGeneral(new General(world, data, *position));
             break;
         }
     }
+    delete position;
 }
 
 void Client::sendPacket(unsigned char code){
@@ -124,8 +129,11 @@ void Client::sendPacket(unsigned char code){
     Network::initPacket(data, code);
 
     switch(code){
-        case PACKET_TS_USERNAME:{
+        case PACKET_TS_CLIENT_INFO:{
             Network::addDataShortString(data, Settings::Client::connectUsername);
+            break;
+        }
+        case PACKET_TS_REQUEST_ALL_WORLD_DATA:{
             break;
         }
     }

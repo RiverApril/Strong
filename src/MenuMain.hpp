@@ -22,6 +22,8 @@ public:
     
     virtual void update();
 
+    void updateSettingsFromInputs();
+
     UiButton* buttonConnect;
     UiTextBox* textAddress;
     UiTextBox* textUsername;

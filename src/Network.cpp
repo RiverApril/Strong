@@ -148,18 +148,7 @@ namespace Network{
 
 
 
-    template<typename T>
-    void addDataNumber(vector<unsigned char>& data, T n){
-        union {
-            T n;
-            unsigned char b[sizeof(T)];
-        } uBytes;
-
-        uBytes.n = n;
-        for (size_t i = 0; i < sizeof(T); i++) {
-            data.push_back((unsigned char) (uBytes.b[i] & 0xFF));
-        }
-    }
+    
 
     void addDataUChar(vector<unsigned char>& data, unsigned char n){
         data.push_back(n);
@@ -178,19 +167,7 @@ namespace Network{
 
 
 
-    template<typename T>
-    void readDataNumber(unsigned char* data, size_t& position, T& n){
-        union {
-            T n;
-            unsigned char b[sizeof(T)];
-        } uBytes;
-
-        for (size_t i = 0; i<sizeof(T); i++) {
-            uBytes.b[i] = data[position];
-            position++;
-        }
-        n = uBytes.n;
-    }
+    
 
 
     void readDataUChar(unsigned char* data, size_t& position, unsigned char& n){

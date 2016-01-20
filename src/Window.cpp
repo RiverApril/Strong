@@ -48,18 +48,28 @@ Window::~Window(){
 }
 
 void Window::update(){
-    client->update();
+
+    currentTime = SDL_GetTicks();
 
     processEvents();
 
-    SDL_RenderClear(sdlRenderer);
+    while(previousTime + TIME_PER_UPDATE < currentTime){
+        previousTime += TIME_PER_UPDATE;
 
-    if(currentMenu){
-    	currentMenu->update();
-    	currentMenu->render();
+        client->update();
+
+        if(currentMenu){
+            currentMenu->update();
+        }
+
+        SDL_RenderClear(sdlRenderer);
+
+        if(currentMenu){
+            currentMenu->render();
+        }
+
+        SDL_RenderPresent(sdlRenderer);
     }
-
-    SDL_RenderPresent(sdlRenderer);
 }
 
 void Window::processEvents(){

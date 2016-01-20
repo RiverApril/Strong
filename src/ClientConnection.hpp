@@ -12,6 +12,7 @@
 #include "Network.hpp"
 
 class Server;
+class General;
 
 class ClientConnection{
 public:
@@ -30,6 +31,8 @@ public:
 
     string username = "";
 
+    General* general;
+
     ClientConnection(TCPsocket* hostSocket, TCPsocket* socket, Server* server);
 
     void update();
@@ -37,7 +40,5 @@ public:
 };
 
 int updateCCThread(void* data);
-
-#include "Server.hpp"
 
 #endif

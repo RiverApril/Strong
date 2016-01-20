@@ -14,10 +14,13 @@
 #include <SDL2/SDL_thread.h>
 
 //To client from server:
-#define PACKET_TC_REQUEST_USERNAME 0
+#define PACKET_TC_REQUEST_CLIENT_INFO 0
+#define PACKET_TC_ALL_WORLD_DATA 1
+#define PACKET_TC_NEW_GENERAL 2
 
 //To server from client:
-#define PACKET_TS_USERNAME 0
+#define PACKET_TS_CLIENT_INFO 0
+#define PACKET_TS_REQUEST_ALL_WORLD_DATA 1
 
 typedef unsigned short PacketSize_t;
 
@@ -39,13 +42,36 @@ namespace Network{
     int reciveData(TCPsocket* socket, unsigned char* data, PacketSize_t dataSize);
     void recivePacket(TCPsocket* socket, function<void(int, unsigned char, unsigned char*)> process);
 
+
     template<typename T>
-    void addDataNumber(vector<unsigned char>& data, T n);
+    void addDataNumber(vector<unsigned char>& data, T n){
+        union {
+            T n;
+            unsigned char b[sizeof(T)];
+        } uBytes;
+
+        uBytes.n = n;
+        for (size_t i = 0; i < sizeof(T); i++) {
+            data.push_back((unsigned char) (uBytes.b[i] & 0xFF));
+        }
+    }
     void addDataUChar(vector<unsigned char>& data, unsigned char n);
     void addDataShortString(vector<unsigned char>& data, string n);
 
+
     template<typename T>
-    void readDataNumber(unsigned char* data, size_t& position, T& n);
+    void readDataNumber(unsigned char* data, size_t& position, T& n){
+        union {
+            T n;
+            unsigned char b[sizeof(T)];
+        } uBytes;
+
+        for (size_t i = 0; i<sizeof(T); i++) {
+            uBytes.b[i] = data[position];
+            position++;
+        }
+        n = uBytes.n;
+    }
     void readDataUChar(unsigned char* data, size_t& position, unsigned char& n);
     void readDataShortString(unsigned char* data, size_t& position, string& n);
 

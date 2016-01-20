@@ -11,6 +11,8 @@
 
 #include "Network.hpp"
 
+class World;
+
 class Client{
 public:
 
@@ -21,6 +23,8 @@ public:
 
     TCPsocket* socket = new TCPsocket();
     IPaddress* ip = new IPaddress();
+
+    World* world;
 
     Client();
 

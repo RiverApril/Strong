@@ -30,7 +30,8 @@ public:
     int width = 640;
     int height = 480;
 
-
+    Uint32 currentTime = 0;
+    Uint32 previousTime = 0;
     
     Window();
 

@@ -12,6 +12,8 @@
 
 Server::Server(){
 
+    world = new World(this);
+
 }
 
 void Server::update(){
@@ -23,7 +25,7 @@ void Server::update(){
         ClientConnection* clientConnection = new ClientConnection(socket, clientSocket, this);
         clientList.push_back(clientConnection);
         printf("Sending username request...\n");
-        sendPacket(clientConnection, PACKET_TC_REQUEST_USERNAME);
+        sendPacket(clientConnection, PACKET_TC_REQUEST_CLIENT_INFO);
     }else{
         delete clientSocket;
     }
@@ -42,6 +44,16 @@ void Server::update(){
             }
         }
         clientRemoveList.erase(clientRemoveList.begin());
+    }
+
+    currentTime = SDL_GetTicks();
+
+    if(serverIsStarted){
+        while(previousTime + TIME_PER_UPDATE < currentTime){
+            previousTime += TIME_PER_UPDATE;
+    		world->update();
+            tick++;
+        }
     }
 
 
@@ -92,33 +104,60 @@ void Server::processPacket(ClientConnection* from, unsigned char code, unsigned 
 
     size_t position = 0;
     switch (code) {
-        case PACKET_TS_USERNAME:{
+        case PACKET_TS_CLIENT_INFO:{
             if(data){
                 Network::readDataShortString(data, position, from->username);
                 printf("Username set: %s\n", from->username.c_str());
+                from->general = new General(world, from->username);
+                world->newGeneral(from->general);
             }else{
                 printf("data is nullptr\n");
             }
             break;
         }
+        case PACKET_TS_REQUEST_ALL_WORLD_DATA:{
+            sendPacket(from, PACKET_TC_ALL_WORLD_DATA);
+            break;
+        }
     }
 }
 
-void Server::sendPacket(ClientConnection* to, unsigned char code){
-    while(to->sendLock);
-    to->sendLock = true;
+void Server::sendPacketToAll(unsigned char code, void* meta){
+    sendPacket(nullptr, code, meta);
+}
+
+void Server::sendPacket(ClientConnection* to, unsigned char code, void* meta){
 
     vector<unsigned char> data;
     Network::initPacket(data, code);
 
     switch(code){
-        case PACKET_TC_REQUEST_USERNAME:{
+        case PACKET_TC_REQUEST_CLIENT_INFO:{
+            break;
+        }
+        case PACKET_TC_ALL_WORLD_DATA:{
+            world->writeData(data);
+            break;
+        }
+        case PACKET_TC_NEW_GENERAL:{
+            ((General*)meta)->writeData(data);
             break;
         }
     }
 
     Network::finishPacket(data);
-    Network::sendData(to->socket, data);
+    if(to){
+        while(to->sendLock);
+        to->sendLock = true;
+        Network::sendData(to->socket, data);
+        to->sendLock = false;
+    }else{
+        for(ClientConnection* cc : clientList){
+            while(cc->sendLock);
+            cc->sendLock = true;
+            Network::sendData(cc->socket, data);
+            cc->sendLock = false;
+        }
+    }
 
-    to->sendLock = false;
 }

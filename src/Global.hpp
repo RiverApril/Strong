@@ -22,4 +22,6 @@
 
 using namespace std;
 
+#define TIME_PER_UPDATE (1000/60)
+
 #endif

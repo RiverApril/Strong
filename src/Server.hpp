@@ -11,6 +11,7 @@
 
 #include "Network.hpp"
 #include "ClientConnection.hpp"
+#include "World.hpp"
 
 class Server{
 public:
@@ -24,6 +25,13 @@ public:
     vector<ClientConnection*> clientList;
     vector<ClientConnection*> clientRemoveList;
 
+    World* world;
+
+    Uint32 currentTime = 0;
+    Uint32 previousTime = 0;
+
+    unsigned long tick = 0;
+
     Server();
 
     ~Server(){}
@@ -35,7 +43,8 @@ public:
     void clientDisconnected(ClientConnection* cc, bool intentional);
 
     void processPacket(ClientConnection* from, unsigned char code, unsigned char* data);
-    void sendPacket(ClientConnection* to, unsigned char code);
+    void sendPacket(ClientConnection* to, unsigned char code, void* meta = nullptr);
+    void sendPacketToAll(unsigned char code, void* meta = nullptr);
 
 };
 
