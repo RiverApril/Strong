@@ -55,3 +55,11 @@ MenuMain::~MenuMain(){
 
 }
 
+void MenuMain::update(){
+    Menu::update();
+    
+    if(window->client->connected){
+        //changeMenu(new MenuPreGame(this), false);
+    }
+    
+}

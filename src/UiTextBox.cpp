@@ -30,8 +30,6 @@ UiTextBox::UiTextBox(int x, int y, int w, int h, string text, function<void(UiTe
 }
 
 UiTextBox::~UiTextBox(){
-    delete clipDefault;
-    delete clipFocused;
     delete imageText;
 }
 
@@ -94,7 +92,7 @@ bool UiTextBox::textInput(string s){
 
 void UiTextBox::render(){
 
-    Graphics::drawStretchableBox(menu->window, x, y, w, h, image, focused?clipFocused:clipDefault);
+    Graphics::drawStretchableBox(menu->window, x, y, w, h, image, enabled?(focused?&clipFocused:&clipDefault):&clipDisabled);
 
     if(text.size() > 0 || focused){
         if(mustUpdateText){

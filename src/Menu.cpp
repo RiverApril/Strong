@@ -135,7 +135,7 @@ void Menu::update(){
 
 void Menu::render(){
     for(UiObject* o : uiObjectList){
-        if(o->enabled && o->visable){
+        if(o->visable){
             o->render();
         }
     }

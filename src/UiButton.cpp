@@ -26,8 +26,6 @@ UiButton::UiButton(int x, int y, int w, int h, string text, function<void(UiButt
 }
 
 UiButton::~UiButton(){
-    delete clipDefault;
-    delete clipHover;
     delete imageText;
 }
 
@@ -82,7 +80,7 @@ void UiButton::render(){
         }
     }
 
-    Graphics::drawStretchableBox(menu->window, x, y, w, h, image, hover?clipHover:clipDefault);
+    Graphics::drawStretchableBox(menu->window, x, y, w, h, image, enabled?(hover?&clipHover:&clipDefault):&clipDisabled);
     Graphics::drawImage(menu->window, x+padding, y+padding, textW, textH, imageText, NULL);
 
 }

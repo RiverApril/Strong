@@ -19,6 +19,8 @@ public:
     MenuMain(Window* window);
 
     virtual ~MenuMain();
+    
+    virtual void update();
 
     UiButton* buttonConnect;
     UiTextBox* textAddress;

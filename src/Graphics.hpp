@@ -25,7 +25,7 @@ namespace Graphics{
     void init();
     void cleanup();
 
-    SDL_Rect* newRect(int x, int y, int w, int h);
+    SDL_Rect rect(int x, int y, int w, int h);
 
     void loadImages(Window* window);
     Image* loadImage(Window* window, string path);

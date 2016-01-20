@@ -43,8 +43,9 @@ public:
     function<void(UiButton*)> onClick;
 
     Image* image = Graphics::imageGui;
-    SDL_Rect* clipDefault = Graphics::newRect(0, 0, 12, 12);
-    SDL_Rect* clipHover = Graphics::newRect(12, 0, 12, 12);
+    SDL_Rect clipDefault = Graphics::rect(0, 0, 12, 12);
+    SDL_Rect clipHover = Graphics::rect(12, 0, 12, 12);
+    SDL_Rect clipDisabled = Graphics::rect(12*2, 0, 12, 12);
 
     Image* imageText = new Image();
 };
