@@ -25,6 +25,8 @@ public:
 
     ~World();
 
+    UID nextUid = 1;
+
     void update();
     void render();
 
@@ -34,7 +36,7 @@ public:
     void newGeneral(General* general);
 
     vector<General*> generalsToAdd;
-    vector<General*> generals;
+    map<UID, General*> generals;
 
 };
 

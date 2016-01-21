@@ -8,6 +8,8 @@
 
 #include "Server.hpp"
 #include "Settings.hpp"
+#include "Debug.hpp"
+#include "Unit.hpp"
 
 
 Server::Server(){
@@ -24,7 +26,7 @@ void Server::update(){
     if(*clientSocket){
         ClientConnection* clientConnection = new ClientConnection(socket, clientSocket, this);
         clientList.push_back(clientConnection);
-        printf("Sending username request...\n");
+        debugf("Sending username request...");
         sendPacket(clientConnection, PACKET_TC_REQUEST_CLIENT_INFO);
     }else{
         delete clientSocket;
@@ -61,10 +63,10 @@ void Server::update(){
 
 void Server::setPort(bool setPort){
     while(setPort){
-        printf("Enter host port:\n");
+        debugf("Enter host port:");
         cin >> Settings::Server::hostPort;
         if(Settings::Server::hostPort < 0 || Settings::Server::hostPort > 65535){
-            printf("Port must be between 0 and 65535\n");
+            debugf("Port must be between 0 and 65535");
         }else{
             break;
         }
@@ -73,16 +75,16 @@ void Server::setPort(bool setPort){
 
 void Server::startServer(){
     if(serverIsStarted){
-        printf("Server is already started\n");
+        debugf("Server is already started");
     }else{
         serverIsStarted = true;
-        printf("Starting server on port: %d\n", Settings::Server::hostPort);
+        debugf("Starting server on port: %d", Settings::Server::hostPort);
 
         bool success = Network::initHost(Settings::Server::hostPort, socket, ip);
         if(success){
-            printf("Server Started\n");
+            debugf("Server Started");
         }else{
-            printf("Failed to start server\n");
+            debugf("Failed to start server");
             serverIsStarted = false;
             return;
         }
@@ -93,30 +95,54 @@ void Server::clientDisconnected(ClientConnection* cc, bool intentional){
 	SDLNet_TCP_Close(*(cc->socket));
     clientRemoveList.push_back(cc);
     if(intentional){
-        printf("Client disconnected\n");
+        debugf("Client disconnected");
     }else{
-        printf("Client lost connection\n");
+        debugf("Client lost connection");
     }
 }
 
 void Server::processPacket(ClientConnection* from, unsigned char code, unsigned char* data){
-    printf("Server recived code: %d\n", code);
+    debugf("Server recived code: %d", code);
 
     size_t position = 0;
     switch (code) {
         case PACKET_TS_CLIENT_INFO:{
             if(data){
                 Network::readDataShortString(data, position, from->username);
-                printf("Username set: %s\n", from->username.c_str());
+                debugf("Username set: %s", from->username.c_str());
                 from->general = new General(world, from->username);
                 world->newGeneral(from->general);
+                sendPacketToAllExcept(from, PACKET_TC_NEW_GENERAL, from->general);
+                sendPacket(from, PACKET_TC_YOUR_NEW_GENERAL, from->general);
             }else{
-                printf("data is nullptr\n");
+                debugf("data is nullptr");
             }
             break;
         }
         case PACKET_TS_REQUEST_ALL_WORLD_DATA:{
             sendPacket(from, PACKET_TC_ALL_WORLD_DATA);
+            break;
+        }
+        case PACKET_TS_NEW_UNIT:{
+            from->general->newUnit(new Unit(from->general, data, position));
+            break;
+        }
+        case PACKET_TS_UNIT_TARGET_SET:{
+            UID uid;
+            Network::readDataNumber(data, position, uid);
+            from->general->units[uid]->readTargetData(data, position);
+            sendPacketToAll(PACKET_TC_UNIT_TARGET_SET, from->general->units[uid]);
+            break;
+        }
+        case PACKET_TS_UNIT_TARGET_REACHED:{
+            UID uid;
+            Network::readDataNumber(data, position, uid);
+            from->general->units[uid]->readPosData(data, position);
+            sendPacketToAll(PACKET_TC_UNIT_TARGET_REACHED, from->general->units[uid]);
+            break;
+        }
+        default:{
+            debugf("Server recived packet it shoudlen't have: %d", code);
             break;
         }
     }
@@ -126,7 +152,11 @@ void Server::sendPacketToAll(unsigned char code, void* meta){
     sendPacket(nullptr, code, meta);
 }
 
-void Server::sendPacket(ClientConnection* to, unsigned char code, void* meta){
+void Server::sendPacketToAllExcept(ClientConnection* but, unsigned char code, void* meta){
+    sendPacket(but, code, meta, true);
+}
+
+void Server::sendPacket(ClientConnection* to, unsigned char code, void* meta, bool allBut){
 
     vector<unsigned char> data;
     Network::initPacket(data, code);
@@ -140,19 +170,45 @@ void Server::sendPacket(ClientConnection* to, unsigned char code, void* meta){
             break;
         }
         case PACKET_TC_NEW_GENERAL:{
-            ((General*)meta)->writeData(data);
+            ((General*)meta)->writeAllData(data);
+            break;
+        }
+        case PACKET_TC_YOUR_NEW_GENERAL:{
+            ((General*)meta)->writeAllData(data);
+            break;
+        }
+        case PACKET_TC_NEW_UNIT:{
+            Network::addDataNumber(data, ((Unit*)meta)->general->uid);
+            ((Unit*)meta)->writeAllData(data);
+            break;
+        }
+        case PACKET_TC_UNIT_TARGET_SET:{
+            Network::addDataNumber(data, ((Unit*)meta)->general->uid);
+            ((Unit*)meta)->writeTargetData(data);
+            break;
+        }
+        case PACKET_TC_UNIT_TARGET_REACHED:{
+            Network::addDataNumber(data, ((Unit*)meta)->general->uid);
+            ((Unit*)meta)->writePosData(data);
+            break;
+        }
+        default:{
+            debugf("Server sending packet it shoudlen't: %d", code);
             break;
         }
     }
 
     Network::finishPacket(data);
-    if(to){
+    if(to && !allBut){
         while(to->sendLock);
         to->sendLock = true;
         Network::sendData(to->socket, data);
         to->sendLock = false;
     }else{
         for(ClientConnection* cc : clientList){
+            if(allBut && cc == to){
+                continue;
+            }
             while(cc->sendLock);
             cc->sendLock = true;
             Network::sendData(cc->socket, data);

@@ -12,6 +12,7 @@
 #include "Menu.hpp"
 
 class World;
+class Unit;
 
 class MenuGame : public Menu{
 public:
@@ -24,9 +25,26 @@ public:
 
     virtual void closeMenu();
 
+    virtual bool keyPressed(SDL_Keysym key);
+
+    virtual bool mouseDown(int x, int y, int button);
+
+    virtual bool mouseMove(int x, int y);
+
+    virtual bool mouseUp(int x, int y, int button);
+
     virtual void update();
 
     virtual void render();
+
+    int selectInitX = -1;
+    int selectInitY = -1;
+    int selectX = -1;
+    int selectY = -1;
+
+    SDL_Color selectColor = {0, 127, 255, 255};
+
+    vector<Unit*> selectedUnits;
 
     Menu* upperMenu;
     

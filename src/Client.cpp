@@ -9,8 +9,12 @@
 #include "Client.hpp"
 #include "Settings.hpp"
 #include "World.hpp"
+#include "Window.hpp"
+#include "Debug.hpp"
+#include "Unit.hpp"
 
-Client::Client(){
+Client::Client(Window* window){
+    this->window = window;
     world = new World(this);
 }
 
@@ -46,30 +50,30 @@ void Client::update(){
 
 void Client::setValues(bool setIp, bool setPort, bool setUsername){
     while(setIp){
-        printf("Enter IP address:\n");
+        debugf("Enter IP address:");
         cin >> Settings::Client::connectAddress;
         if(Settings::Client::connectAddress.size() > 0){
             setIp = false;
         }else{
-            printf("You must enter an Address\n");
+            debugf("You must enter an Address");
         }
     }
     while(setPort){
-        printf("Enter port:\n");
+        debugf("Enter port:");
         cin >> Settings::Client::connectPort;
         if(Settings::Client::connectPort < 0 || Settings::Client::connectPort > 65535){
-            printf("Port must be between 0 and 65535\n");
+            debugf("Port must be between 0 and 65535");
         }else{
             setPort = false;
         }
     }
     while(setUsername){
-        printf("Enter Unsername:\n");
+        debugf("Enter Unsername:");
         cin >> Settings::Client::connectUsername;
         if(Settings::Client::connectUsername.size() > 0){
             setUsername = false;
         }else{
-            printf("You must enter a Username\n");
+            debugf("You must enter a Username");
         }
     }
 }
@@ -77,17 +81,17 @@ void Client::setValues(bool setIp, bool setPort, bool setUsername){
 void Client::connectToServer(){
 
     if(connected){
-        printf("Client is already connected\n");
+        debugf("Client is already connected");
     }else{
         connected = true;
-        printf("Connecting to server: %s:%d as \"%s\"\n", Settings::Client::connectAddress.c_str(), Settings::Client::connectPort, Settings::Client::connectUsername.c_str());
+        debugf("Connecting to server: %s:%d as \"%s\"", Settings::Client::connectAddress.c_str(), Settings::Client::connectPort, Settings::Client::connectUsername.c_str());
 
         bool success = Network::connectToHost(Settings::Client::connectAddress, Settings::Client::connectPort, socket, ip);
         if(success){
-            printf("Connected to server\n");
+            debugf("Connected to server");
             threadRecive = SDL_CreateThread(updateCThread, NULL, this);
         }else{
-            printf("Failed to connect to server\n");
+            debugf("Failed to connect to server");
             connected = false;
             return;
         }
@@ -98,33 +102,63 @@ void Client::serverDisconnected(bool intentional){
 	SDLNet_TCP_Close(*socket);
     connected = false;
     if(intentional){
-        printf("Disconnected from server\n");
+        debugf("Disconnected from server");
     }else{
-        printf("Lost connection to server\n");
+        debugf("Lost connection to server");
     }
 }
 
 void Client::processPacket(unsigned char code, unsigned char* data){
-    printf("Client recived code: %d\n", code);
-    size_t* position = new size_t(0);
+    debugf("Client recived code: %d", code);
+    size_t position = 0;
     switch(code){
         case PACKET_TC_REQUEST_CLIENT_INFO:{
             sendPacket(PACKET_TS_CLIENT_INFO);
             break;
         }
         case PACKET_TC_ALL_WORLD_DATA:{
-            world->readData(data, *position);
+            world->readData(data, position);
             break;
         }
         case PACKET_TC_NEW_GENERAL:{
-            world->newGeneral(new General(world, data, *position));
+            General* g = new General(world, data, position);
+            world->newGeneral(g);
+            break;
+        }
+        case PACKET_TC_YOUR_NEW_GENERAL:{
+            general = new General(world, data, position);
+            world->newGeneral(general);
+            break;
+        }
+        case PACKET_TC_NEW_UNIT:{
+            UID uid;
+            Network::readDataNumber(data, position, uid);
+            General* general = world->generals[uid];
+            general->newUnit(new Unit(general, data, position));
+            break;
+        }
+        case PACKET_TC_UNIT_TARGET_SET:{
+            UID Guid, Uuid;
+            Network::readDataNumber(data, position, Guid);
+            Network::readDataNumber(data, position, Uuid);
+            world->generals[Guid]->units[Uuid]->readTargetData(data, position);
+            break;
+        }
+        case PACKET_TC_UNIT_TARGET_REACHED:{
+            UID Guid, Uuid;
+            Network::readDataNumber(data, position, Guid);
+            Network::readDataNumber(data, position, Uuid);
+            world->generals[Guid]->units[Uuid]->readPosData(data, position);
+            break;
+        }
+        default:{
+            debugf("Client recived packet it shoudlen't have: %d", code);
             break;
         }
     }
-    delete position;
 }
 
-void Client::sendPacket(unsigned char code){
+void Client::sendPacket(unsigned char code, void* meta){
     vector<unsigned char> data;
     Network::initPacket(data, code);
 
@@ -134,6 +168,20 @@ void Client::sendPacket(unsigned char code){
             break;
         }
         case PACKET_TS_REQUEST_ALL_WORLD_DATA:{
+            break;
+        }
+        case PACKET_TS_NEW_UNIT:{
+            ((Unit*)meta)->writeAllData(data);
+            break;
+        }
+        case PACKET_TS_UNIT_TARGET_SET:{
+            ((Unit*)meta)->writeTargetData(data);
+        }
+        case PACKET_TS_UNIT_TARGET_REACHED:{
+            ((Unit*)meta)->writePosData(data);
+        }
+        default:{
+            debugf("Client sending packet it shoudlen't: %d", code);
             break;
         }
     }

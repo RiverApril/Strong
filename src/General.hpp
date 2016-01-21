@@ -23,14 +23,21 @@ public:
     void update();
     void render();
 
-    void writeData(vector<unsigned char>& data);
+    UID nextUid = 1;
+
+    UID uid = 0;
+
+    void writeAllData(vector<unsigned char>& data);
+    void readAllData(unsigned char* data, size_t& position);
     General(World* world, unsigned char* data, size_t& position);
+
+    void newUnit(Unit* unit);
 
     string name = "";
 
     World* world;
 
-    vector<Unit*> units;
+    map<UID, Unit*> units;
     vector<Unit*> unitsToAdd;
     vector<Unit*> unitsToRemove;
     

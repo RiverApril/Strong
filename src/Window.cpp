@@ -10,19 +10,20 @@
 #include "MenuMain.hpp"
 #include "Graphics.hpp"
 #include "Settings.hpp"
+#include "Debug.hpp"
 
 Window::Window(){
-    client = new Client();
+    client = new Client(this);
 
     sdlWindow = SDL_CreateWindow("Strong", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     if(!sdlWindow){
-        fprintf(stderr, "SDL_CreateWindow: %s\n", SDL_GetError());
+        errorf("SDL_CreateWindow: %s", SDL_GetError());
         running = false;
     }
 
     sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
     if(!sdlRenderer){
-        fprintf(stderr, "SDL_CreateRenderer: %s\n", SDL_GetError());
+        errorf("SDL_CreateRenderer: %s", SDL_GetError());
         running = false;
     }
 
@@ -62,6 +63,7 @@ void Window::update(){
             currentMenu->update();
         }
 
+        SDL_SetRenderDrawColor(sdlRenderer, 0, 0, 0, 255);
         SDL_RenderClear(sdlRenderer);
 
         if(currentMenu){

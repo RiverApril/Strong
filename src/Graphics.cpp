@@ -7,24 +7,26 @@
 //
 
 #include "Graphics.hpp"
+#include "Debug.hpp"
 
 namespace Graphics{
 
     Image* imageGui;
+    Image* imageGame;
 
     TTF_Font* fontSmall;
     
     void init(){
         if(SDL_Init(SDL_INIT_VIDEO) == -1){
-            fprintf(stderr, "SDL_Init: %s\n", SDL_GetError());
+            errorf("SDL_Init: %s", SDL_GetError());
             exit(EXIT_FAILURE);
         }
         if(IMG_Init(IMG_INIT_PNG) == -1){
-            fprintf(stderr, "IMG_Init: %s\n", SDL_GetError());
+            errorf("IMG_Init: %s", SDL_GetError());
             exit(EXIT_FAILURE);
         }
         if(TTF_Init() == -1){
-            fprintf(stderr, "TTF_Init: %s\n", SDL_GetError());
+            errorf("TTF_Init: %s", SDL_GetError());
             exit(EXIT_FAILURE);
         }
 
@@ -51,6 +53,7 @@ namespace Graphics{
     void loadImages(Window* window){
 
         imageGui = loadImage(window, "img/gui.png");
+        imageGame = loadImage(window, "img/game.png");
 
         fontSmall = loadFont(window, "img/font.ttf", 12);
 
@@ -64,14 +67,14 @@ namespace Graphics{
             if(texture){
                 Image* image = new Image();
                 image->sdlTexture = texture;
-            	printf("Loaded image: \"%s\"\n", path.c_str());
+            	debugf("Loaded image: \"%s\"", path.c_str());
             	return image;
             }else{
-                printf("Failed to make texture from surface for image: \"%s\"\n", path.c_str());
+                debugf("Failed to make texture from surface for image: \"%s\"", path.c_str());
                 return nullptr;
             }
         }else{
-            printf("Failed to load image: \"%s\"\n", path.c_str());
+            debugf("Failed to load image: \"%s\"", path.c_str());
             return nullptr;
         }
 
@@ -80,12 +83,28 @@ namespace Graphics{
     TTF_Font* loadFont(Window* window, string path, int size){
         TTF_Font* font = TTF_OpenFont(path.c_str(), size);
         if(font){
-            printf("Loaded font: \"%s\"[%d]\n", path.c_str(), size);
+            debugf("Loaded font: \"%s\"[%d]", path.c_str(), size);
             return font;
         }else{
-            printf("Failed to load font: \"%s\"[%d]\n", path.c_str(), size);
+            debugf("Failed to load font: \"%s\"[%d]", path.c_str(), size);
             return nullptr;
         }
+    }
+
+    void drawRectangleOutline(Window* window, int x1, int y1, int x2, int y2, SDL_Color color){
+        SDL_Point p[5];
+        p[0].x = x1;
+        p[0].y = y1;
+        p[1].x = x2;
+        p[1].y = y1;
+        p[2].x = x2;
+        p[2].y = y2;
+        p[3].x = x1;
+        p[3].y = y2;
+        p[4] = p[0];
+
+        SDL_SetRenderDrawColor(window->sdlRenderer, color.r, color.g, color.b, color.a);
+        SDL_RenderDrawLines(window->sdlRenderer, p, 5);
     }
 
     void drawImage(Window* window, int x, int y, int w, int h, Image* img, SDL_Rect* clip){
@@ -195,13 +214,13 @@ namespace Graphics{
                 if(texture){
                     img->sdlTexture = texture;
                 }else{
-                    printf("Failed to convert surface to texture.\n");
+                    debugf("Failed to convert surface to texture.");
                 }
             }else{
-                printf("Failed to draw text to surface.\n");
+                debugf("Failed to draw text to surface.");
             }
         }else{
-            printf("Trying to save to null image.\n");
+            debugf("Trying to save to null image.");
         }
     }
     

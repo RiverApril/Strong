@@ -8,6 +8,7 @@
 
 #include "ClientConnection.hpp"
 #include "Server.hpp"
+#include "Debug.hpp"
 
 
 ClientConnection::ClientConnection(TCPsocket* hostSocket, TCPsocket* socket, Server* server){
@@ -25,9 +26,9 @@ ClientConnection::ClientConnection(TCPsocket* hostSocket, TCPsocket* socket, Ser
         address += to_string((n & 0x0000FF00) >> 8);
         address += ".";
         address += to_string((n & 0x000000FF));
-        printf("Client connected through address: %s:%d\n", address.c_str(), SDLNet_Read16(&ip->port));
+        debugf("Client connected through address: %s:%d", address.c_str(), SDLNet_Read16(&ip->port));
 	}else{
-		fprintf(stderr, "SDLNet_TCP_GetPeerAddress: %s\n", SDLNet_GetError());
+		errorf("SDLNet_TCP_GetPeerAddress: %s", SDLNet_GetError());
     }
 
     threadRecive = SDL_CreateThread(updateCCThread, NULL, this);

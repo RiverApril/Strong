@@ -48,8 +48,8 @@ bool UiButton::mouseMove(int x, int y){
 }
 
 bool UiButton::mouseDown(int x, int y, int button){
-    if(contains(x, y)){
-        if(button == SDL_BUTTON_LEFT){
+    if(button == SDL_BUTTON_LEFT){
+        if(contains(x, y)){
             clickedDown = true;
             return true;
         }
@@ -58,8 +58,8 @@ bool UiButton::mouseDown(int x, int y, int button){
 }
 
 bool UiButton::mouseUp(int x, int y, int button){
-    if(contains(x, y)){
-        if(button == SDL_BUTTON_LEFT && clickedDown){
+    if(button == SDL_BUTTON_LEFT && clickedDown){
+        if(contains(x, y)){
             clickedDown = false;
             onClick(this);
             return true;

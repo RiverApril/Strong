@@ -7,6 +7,7 @@
 //
 
 #include "Settings.hpp"
+#include "Debug.hpp"
 
 namespace Settings {
 
@@ -111,11 +112,11 @@ namespace Settings {
         FILE* file = fopen(fileName.c_str(), "w");
         if(file){
             for(Setting* setting: *settingList){
-                fputs((setting->name+":"+setting->getValueAsString()+"\n").c_str(), file);
+                fputs((setting->name+":"+setting->getValueAsString()+"").c_str(), file);
             }
             fclose(file);
         }else{
-            fprintf(stderr, "Failed to save file: %s\n", fileName.c_str());
+            errorf("Failed to save file: %s", fileName.c_str());
         }
     }
 
@@ -161,7 +162,7 @@ namespace Settings {
             }while(c != EOF);
             fclose(file);
         }else{
-            fprintf(stderr, "Failed to load file: %s\n", fileName.c_str());
+            errorf("Failed to load file: %s", fileName.c_str());
         }
     }
     

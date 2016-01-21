@@ -43,8 +43,9 @@ public:
     void clientDisconnected(ClientConnection* cc, bool intentional);
 
     void processPacket(ClientConnection* from, unsigned char code, unsigned char* data);
-    void sendPacket(ClientConnection* to, unsigned char code, void* meta = nullptr);
+    void sendPacket(ClientConnection* to, unsigned char code, void* meta = nullptr, bool allBut = false);
     void sendPacketToAll(unsigned char code, void* meta = nullptr);
+    void sendPacketToAllExcept(ClientConnection* but, unsigned char code, void* meta = nullptr);
 
 };
 

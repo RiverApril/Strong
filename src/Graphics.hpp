@@ -19,6 +19,7 @@ class Window;
 namespace Graphics{
 
     extern Image* imageGui;
+    extern Image* imageGame;
 
     extern TTF_Font* fontSmall;
     
@@ -32,6 +33,8 @@ namespace Graphics{
     TTF_Font* loadFont(Window* window, string path, int size);
     void makeClips(Image* img, int clipW, int clipH);
 
+    void drawRectangleOutline(Window* window, int x, int y, int w, int h, SDL_Color color);
+    
     void drawImage(Window* window, int x, int y, int w, int h, Image* img, SDL_Rect* clip);
     void drawStretchableBox(Window* window, int x, int y, int w, int h, Image* img, SDL_Rect* clip);
     

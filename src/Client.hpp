@@ -12,6 +12,8 @@
 #include "Network.hpp"
 
 class World;
+class Window;
+class General;
 
 class Client{
 public:
@@ -25,8 +27,10 @@ public:
     IPaddress* ip = new IPaddress();
 
     World* world;
+    Window* window;
+    General* general;
 
-    Client();
+    Client(Window* window);
 
     ~Client();
 
@@ -36,7 +40,7 @@ public:
 
     void serverDisconnected(bool intentional);
     void processPacket(unsigned char code, unsigned char* data);
-    void sendPacket(unsigned char code);
+    void sendPacket(unsigned char code, void* meta = nullptr);
 
 };
 

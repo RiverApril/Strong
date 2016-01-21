@@ -7,12 +7,13 @@
 //
 
 #include "Network.hpp"
+#include "Debug.hpp"
 
 namespace Network{
 
     void init(){
         if (SDLNet_Init() < 0) {
-    		fprintf(stderr, "SDLNet_Init: %s\n", SDLNet_GetError());
+    		errorf("SDLNet_Init: %s", SDLNet_GetError());
     		exit(EXIT_FAILURE);
     	}
     }
@@ -23,11 +24,11 @@ namespace Network{
 
     bool initHost(int port, TCPsocket* socket, IPaddress* ip){
         if (SDLNet_ResolveHost(ip, NULL, port) < 0) {
-    		fprintf(stderr, "SDLNet_ResolveHost: %s\n", SDLNet_GetError());
+    		errorf("SDLNet_ResolveHost: %s", SDLNet_GetError());
             return false;
     	}
         if (!(*socket = SDLNet_TCP_Open(ip))) {
-    		fprintf(stderr, "SDLNet_TCP_Open: %s\n", SDLNet_GetError());
+    		errorf("SDLNet_TCP_Open: %s", SDLNet_GetError());
             return false;
     	}
         return true;
@@ -45,11 +46,11 @@ namespace Network{
 
     bool connectToHost(string address, int port, TCPsocket* socket, IPaddress* ip){
         if (SDLNet_ResolveHost(ip, address.c_str(), port) < 0) {
-    		fprintf(stderr, "SDLNet_ResolveHost: %s\n", SDLNet_GetError());
+    		errorf("SDLNet_ResolveHost: %s", SDLNet_GetError());
     		return false;
     	}
     	if (!(*socket = SDLNet_TCP_Open(ip))) {
-    		fprintf(stderr, "SDLNet_TCP_Open: %s\n", SDLNet_GetError());
+    		errorf("SDLNet_TCP_Open: %s", SDLNet_GetError());
     		return false;
     	}
         return true;
@@ -57,7 +58,7 @@ namespace Network{
 
     bool sendData(TCPsocket* socket, vector<unsigned char>& data){
         if (SDLNet_TCP_Send(*socket, &data[0], (int)data.size()) < (int)data.size()) {
-			fprintf(stderr, "SDLNet_TCP_Send: %s\n", SDLNet_GetError());
+			errorf("SDLNet_TCP_Send: %s", SDLNet_GetError());
             return false;
 		}
         return true;
