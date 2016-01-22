@@ -11,6 +11,7 @@
 
 #include "General.hpp"
 #include "Graphics.hpp"
+#include "Math.hpp"
 
 class Unit{
 public:
@@ -33,6 +34,7 @@ public:
 
     UID uid = 0;
 
+    //Common:
     double x = 0;
     double y = 0;
 
@@ -41,6 +43,12 @@ public:
 
     double angle = 0;
     double tAngle = 0;
+
+
+    double speedMove = 1;
+    double speedRot = TAU/90;
+    double width = 12;
+    double height = 12;
 
     void setTargetPos(double nx, double ny);
     void setTargetAngle(double nAngle);

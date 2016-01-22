@@ -10,6 +10,7 @@
 #include "Server.hpp"
 #include "Client.hpp"
 #include "Debug.hpp"
+#include "Window.hpp"
 
 World::World(Server* server) : server(server){
 
@@ -34,6 +35,10 @@ void World::update(){
 }
 
 void World::render(){
+
+    SDL_SetRenderDrawColor(client->window->sdlRenderer, 40, 170, 30, 255);
+    SDL_RenderFillRect(client->window->sdlRenderer, &client->window->windowRect);
+
     for(map<UID, General*>::iterator i=generals.begin(); i!=generals.end(); ++i){
         i->second->render();
     }

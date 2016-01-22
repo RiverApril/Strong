@@ -8,15 +8,16 @@
 
 #include "Math.hpp"
 
-double Math::min(double a, double b){
-    return a < b ? a : b;
+double Math::mod(double a, double n){
+    return a - floor(a/n) * n;
 }
 
-double Math::abs(double a){
-    return a < 0 ? -a : a;
+bool Math::intersect(int ax, int ay, int aw, int ah, int bx, int by, int bw, int bh){
+    return (abs(ax - bx) * 2 <= (aw + bw)) &&
+           (abs(ay - by) * 2 <= (ah + bh));
 }
 
-double Math::clampAngle(double a){
+double Math::normalizeAngle(double a){
     while(a > PI){
         a -= TAU;
     }

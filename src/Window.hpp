@@ -10,6 +10,7 @@
 #define Window_hpp
 
 #include "Client.hpp"
+#include "Graphics.hpp"
 
 class Menu;
 
@@ -25,20 +26,20 @@ public:
     SDL_Renderer* sdlRenderer = nullptr;
     SDL_Event inputEvent;
 
-    Menu* currentMenu = nullptr;
+    SDL_Rect windowRect = Graphics::rect(0, 0, 640, 480);
 
-    int width = 640;
-    int height = 480;
+    Menu* currentMenu = nullptr;
 
     Uint32 currentTime = 0;
     Uint32 previousTime = 0;
     
     Window();
-
-    void changeMenu(Menu* nextMenu, bool deleteOld);
     
     ~Window();
-    
+
+
+    void changeMenu(Menu* nextMenu, bool deleteOld);
+    void wasResized(int width, int height);
     void update();
     void processEvents();
     

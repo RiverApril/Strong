@@ -12,6 +12,7 @@
 #include "Window.hpp"
 #include "Graphics.hpp"
 #include "Settings.hpp"
+#include "Math.hpp"
 
 int main(int argc, char* argv[]){
 

@@ -91,20 +91,15 @@ namespace Graphics{
         }
     }
 
-    void drawRectangleOutline(Window* window, int x1, int y1, int x2, int y2, SDL_Color color){
-        SDL_Point p[5];
-        p[0].x = x1;
-        p[0].y = y1;
-        p[1].x = x2;
-        p[1].y = y1;
-        p[2].x = x2;
-        p[2].y = y2;
-        p[3].x = x1;
-        p[3].y = y2;
-        p[4] = p[0];
+    void drawRectangleOutline(Window* window, int x, int y, int w, int h, SDL_Color color){
+        SDL_Rect r;
+        r.x = x;
+        r.y = y;
+        r.w = w;
+        r.h = h;
 
         SDL_SetRenderDrawColor(window->sdlRenderer, color.r, color.g, color.b, color.a);
-        SDL_RenderDrawLines(window->sdlRenderer, p, 5);
+        SDL_RenderDrawRect(window->sdlRenderer, &r);
     }
 
     void drawImage(Window* window, int x, int y, int w, int h, Image* img, SDL_Rect* clip){
@@ -114,6 +109,18 @@ namespace Graphics{
         r.w = w;
         r.h = h;
         SDL_RenderCopy(window->sdlRenderer, img->sdlTexture, clip, &r);
+    }
+
+    void drawImageEx(Window* window, int x, int y, int w, int h, Image* img, SDL_Rect* clip, double angle, int cx, int cy, SDL_RendererFlip flip){
+        SDL_Rect r;
+        r.x = x;
+        r.y = y;
+        r.w = w;
+        r.h = h;
+        SDL_Point p;
+        p.x = cx;
+        p.y = cy;
+        SDL_RenderCopyEx(window->sdlRenderer, img->sdlTexture, clip, &r, angle, &p, flip);
     }
 
     void drawStretchableBox(Window* window, int x, int y, int w, int h, Image* img, SDL_Rect* clip){

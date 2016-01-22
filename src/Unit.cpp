@@ -11,17 +11,12 @@
 #include "Graphics.hpp"
 #include "Math.hpp"
 #include "Server.hpp"
+#include "MenuGame.hpp"
 
-#define WIDTH 12
-#define HEIGHT 12
-#define HALF_WIDTH (WIDTH/2)
-#define HALF_HEIGHT (HEIGHT/2)
+#define viewOffsetX (((MenuGame*)client->window->currentMenu)->viewOffsetX)
+#define viewOffsetY (((MenuGame*)client->window->currentMenu)->viewOffsetY)
 
 
-#define CLOSE_ENOUGH 1
-
-#define SPEED_ROTATION 2
-#define SPEED_MOVEMENT .5
 
 #define client (general->world->client)
 #define server (general->world->server)
@@ -39,11 +34,11 @@ Unit::Unit(General* general, unsigned char* data, size_t& position){
 void Unit::setTargetPos(double nx, double ny){
     tx = nx;
     ty = ny;
-    tAngle = Math::clampAngle(atan2(ty-y, tx-x));
+    tAngle = Math::normalizeAngle(atan2(ty-y, tx-x));
 }
 
 void Unit::setTargetAngle(double nAngle){
-    tAngle = Math::clampAngle(nAngle);
+    tAngle = Math::normalizeAngle(nAngle);
 }
 
 void Unit::update(){
@@ -51,13 +46,13 @@ void Unit::update(){
 
     if(x != tx || y != ty || angle != tAngle){
 
-        double angleDif = Math::clampAngle(angle - tAngle);
+        double dir = Math::mod(((tAngle - angle) + PI), TAU) - PI;
 
         if(angle != tAngle){
-            if(abs(angleDif) <= CLOSE_ENOUGH){
+            if(abs(tAngle - angle) <= speedRot){
                 angle = tAngle;
             }else{
-                angle += Math::closestToZero(angleDif, SPEED_ROTATION);
+                angle = Math::normalizeAngle(angle+(dir>0?speedRot:-speedRot));
             }
         }
 
@@ -65,21 +60,22 @@ void Unit::update(){
             double xDif = x-tx;
             double yDif = y-ty;
 
-            if(abs(xDif) <= CLOSE_ENOUGH){
+            if(abs(xDif) <= speedMove){
                 x = tx;
-            }else if(x != tx){
-                x += SPEED_MOVEMENT * cos(angle);
             }
 
-            if(abs(yDif) <= CLOSE_ENOUGH){
+            if(abs(yDif) <= speedMove){
                 y = ty;
-            }else if(y != ty){
-                y += SPEED_MOVEMENT * sin(angle);
             }
 
-            if(x != tx && y != ty){
-                tAngle = Math::clampAngle(atan2(ty-y, tx-x));
+            if(x != tx || y != ty){
+                x += speedMove * cos(angle);
+                y += speedMove * sin(angle);
             }
+
+            //if(x != tx || y != ty){
+                //tAngle = Math::normalizeAngle(atan2(ty-y, tx-x));
+            //}
         }
 
         if(server && x == tx && y == ty && angle == tAngle){
@@ -93,7 +89,7 @@ void Unit::update(){
 }
 
 void Unit::render(){
-    Graphics::drawImage(client->window, x-HALF_WIDTH, y-HALF_HEIGHT, WIDTH, HEIGHT, image, &clip);
+    Graphics::drawImage(client->window, viewOffsetX+x-(width/2), viewOffsetY+y-(height/2), width, height, image, &clip);
 }
 
 void Unit::writeAllData(vector<unsigned char>& data){
@@ -104,6 +100,10 @@ void Unit::writeAllData(vector<unsigned char>& data){
     Network::addDataNumber(data, ty);
     Network::addDataNumber(data, angle);
     Network::addDataNumber(data, tAngle);
+    Network::addDataNumber(data, speedMove);
+    Network::addDataNumber(data, speedRot);
+    Network::addDataNumber(data, width);
+    Network::addDataNumber(data, height);
 }
 
 void Unit::readAllData(unsigned char* data, size_t& position){
@@ -114,6 +114,10 @@ void Unit::readAllData(unsigned char* data, size_t& position){
     Network::readDataNumber(data, position, ty);
     Network::readDataNumber(data, position, angle);
     Network::readDataNumber(data, position, tAngle);
+    Network::readDataNumber(data, position, speedMove);
+    Network::readDataNumber(data, position, speedRot);
+    Network::readDataNumber(data, position, width);
+    Network::readDataNumber(data, position, height);
 }
 
 void Unit::writeTargetData(vector<unsigned char>& data){

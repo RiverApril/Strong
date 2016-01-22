@@ -10,6 +10,7 @@
 #define MenuGame_hpp
 
 #include "Menu.hpp"
+#include "Graphics.hpp"
 
 class World;
 class Unit;
@@ -42,7 +43,14 @@ public:
     int selectX = -1;
     int selectY = -1;
 
+    int viewOffsetX = 0;
+    int viewOffsetY = 0;
+
+    const Uint8* keyboardState;
+
     SDL_Color selectColor = {0, 127, 255, 255};
+
+    SDL_Rect arrowClip = Graphics::rect(0, 12, 12, 12);
 
     vector<Unit*> selectedUnits;
 

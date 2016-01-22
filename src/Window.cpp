@@ -15,7 +15,7 @@
 Window::Window(){
     client = new Client(this);
 
-    sdlWindow = SDL_CreateWindow("Strong", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+    sdlWindow = SDL_CreateWindow("Strong", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowRect.w, windowRect.h, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     if(!sdlWindow){
         errorf("SDL_CreateWindow: %s", SDL_GetError());
         running = false;
@@ -46,6 +46,15 @@ void Window::changeMenu(Menu* nextMenu, bool deleteOld){
 
 Window::~Window(){
     SDL_DestroyWindow(sdlWindow);
+}
+
+void Window::wasResized(int width, int height){
+    SDL_RenderSetLogicalSize(sdlRenderer, width, height);
+    windowRect.w = width;
+    windowRect.h = height;
+    if(currentMenu){
+        currentMenu->windowResized();
+    }
 }
 
 void Window::update(){
@@ -134,12 +143,7 @@ void Window::processEvents(){
             case SDL_WINDOWEVENT:{
                 switch (inputEvent.window.event) {
                     case SDL_WINDOWEVENT_RESIZED:
-                        width = inputEvent.window.data1;
-                        height = inputEvent.window.data2;
-                        SDL_RenderSetLogicalSize(sdlRenderer, width, height);
-                        if(currentMenu){
-                            currentMenu->windowResized();
-                        }
+                        wasResized(inputEvent.window.data1, inputEvent.window.data2);
                         break;
                         
                     default:
