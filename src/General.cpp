@@ -26,7 +26,7 @@ void General::update(){
         i->second->update();
     }
     while(unitsToRemove.size() > 0){
-        units.erase(unitsToRemove[0]->uid);
+        units.erase(unitsToRemove[0]);
         unitsToRemove.erase(unitsToRemove.begin());
     }
 

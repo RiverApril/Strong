@@ -39,7 +39,7 @@ public:
 
     map<UID, Unit*> units;
     vector<Unit*> unitsToAdd;
-    vector<Unit*> unitsToRemove;
+    vector<UID> unitsToRemove;
     
 };
 

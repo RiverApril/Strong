@@ -151,6 +151,13 @@ void Client::processPacket(unsigned char code, unsigned char* data){
             world->generals[Guid]->units[Uuid]->readPosData(data, position);
             break;
         }
+        case PACKET_TC_UNIT_REMOVE:{
+            UID Guid, Uuid;
+            Network::readDataNumber(data, position, Guid);
+            Network::readDataNumber(data, position, Uuid);
+            world->generals[Guid]->unitsToRemove.push_back(Uuid);
+            break;
+        }
         default:{
             debugf("Client recived packet it shoudlen't have: %d", code);
             break;
@@ -180,6 +187,10 @@ void Client::sendPacket(unsigned char code, void* meta){
         }
         case PACKET_TS_UNIT_TARGET_REACHED:{
             ((Unit*)meta)->writePosData(data);
+            break;
+        }
+        case PACKET_TS_UNIT_REMOVE:{
+            Network::addDataNumber(data, ((Unit*)meta)->uid);
             break;
         }
         default:{

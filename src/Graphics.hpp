@@ -36,7 +36,7 @@ namespace Graphics{
     void drawRectangleOutline(Window* window, int x, int y, int w, int h, SDL_Color color);
     
     void drawImage(Window* window, int x, int y, int w, int h, Image* img, SDL_Rect* clip);
-    void drawImageEx(Window* window, int x, int y, int w, int h, Image* img, SDL_Rect* clip, double angle = 0, int cx = 0, int cy = 0, SDL_RendererFlip flip = SDL_FLIP_NONE);
+    void drawImageEx(Window* window, int x, int y, int w, int h, Image* img, SDL_Rect* clip, float angle = 0, int cx = 0, int cy = 0, SDL_RendererFlip flip = SDL_FLIP_NONE);
     void drawStretchableBox(Window* window, int x, int y, int w, int h, Image* img, SDL_Rect* clip);
     
     void makeImageFromText(Window* window, string text, Image* img, TTF_Font* font, SDL_Color color);

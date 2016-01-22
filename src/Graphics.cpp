@@ -111,7 +111,7 @@ namespace Graphics{
         SDL_RenderCopy(window->sdlRenderer, img->sdlTexture, clip, &r);
     }
 
-    void drawImageEx(Window* window, int x, int y, int w, int h, Image* img, SDL_Rect* clip, double angle, int cx, int cy, SDL_RendererFlip flip){
+    void drawImageEx(Window* window, int x, int y, int w, int h, Image* img, SDL_Rect* clip, float angle, int cx, int cy, SDL_RendererFlip flip){
         SDL_Rect r;
         r.x = x;
         r.y = y;

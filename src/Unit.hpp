@@ -31,33 +31,38 @@ public:
 
     void update();
     void render();
-
-    UID uid = 0;
-
-    //Common:
-    double x = 0;
-    double y = 0;
-
-    double tx = 0;
-    double ty = 0;
-
-    double angle = 0;
-    double tAngle = 0;
-
-
-    double speedMove = 1;
-    double speedRot = TAU/90;
-    double width = 12;
-    double height = 12;
-
-    void setTargetPos(double nx, double ny);
-    void setTargetAngle(double nAngle);
+    void setTargetPos(float nx, float ny);
+    void setTargetAngle(float nAngle);
 
     General* general;
 
     Image* image = Graphics::imageGame;
 
     SDL_Rect clip = Graphics::rect(0, 0, 12, 12);
+
+    UID uid = 0;
+
+    //Changes Frequently:
+    float x = 0;
+    float y = 0;
+
+    float tx = 0;
+    float ty = 0;
+
+    float angle = 0;
+    float tAngle = 0;
+
+    //Mostly constant:
+    float speedMove = 1;
+    float speedRot = TAU/90;
+
+    float width = 12;
+    float height = 12;
+
+    int count = 500;
+    float morale = 1;
+    float attackPotential = 1;
+
     
 };
 

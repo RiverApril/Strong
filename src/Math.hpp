@@ -29,13 +29,13 @@ namespace Math {
         return a < 0 ? -a : a;
     }
 
-    double mod(double a, double n);
+    float mod(float a, float n);
 
     bool intersect(int ax1, int ay1, int ax2, int ay2, int bx1, int by1, int bx2, int by2);
 
-    double normalizeAngle(double a);
+    float normalizeAngle(float a);
 
-    double closestToZero(double a, double b);
+    float closestToZero(float a, float b);
 
 }
 

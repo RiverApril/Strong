@@ -31,13 +31,13 @@ Unit::Unit(General* general, unsigned char* data, size_t& position){
     readAllData(data, position);
 }
 
-void Unit::setTargetPos(double nx, double ny){
+void Unit::setTargetPos(float nx, float ny){
     tx = nx;
     ty = ny;
     tAngle = Math::normalizeAngle(atan2(ty-y, tx-x));
 }
 
-void Unit::setTargetAngle(double nAngle){
+void Unit::setTargetAngle(float nAngle){
     tAngle = Math::normalizeAngle(nAngle);
 }
 
@@ -46,7 +46,7 @@ void Unit::update(){
 
     if(x != tx || y != ty || angle != tAngle){
 
-        double dir = Math::mod(((tAngle - angle) + PI), TAU) - PI;
+        float dir = Math::mod(((tAngle - angle) + PI), TAU) - PI;
 
         if(angle != tAngle){
             if(abs(tAngle - angle) <= speedRot){
@@ -57,8 +57,8 @@ void Unit::update(){
         }
 
         if(angle == tAngle){
-            double xDif = x-tx;
-            double yDif = y-ty;
+            float xDif = x-tx;
+            float yDif = y-ty;
 
             if(abs(xDif) <= speedMove){
                 x = tx;
@@ -104,6 +104,9 @@ void Unit::writeAllData(vector<unsigned char>& data){
     Network::addDataNumber(data, speedRot);
     Network::addDataNumber(data, width);
     Network::addDataNumber(data, height);
+    Network::addDataNumber(data, count);
+    Network::addDataNumber(data, morale);
+    Network::addDataNumber(data, attackPotential);
 }
 
 void Unit::readAllData(unsigned char* data, size_t& position){
@@ -118,6 +121,9 @@ void Unit::readAllData(unsigned char* data, size_t& position){
     Network::readDataNumber(data, position, speedRot);
     Network::readDataNumber(data, position, width);
     Network::readDataNumber(data, position, height);
+    Network::readDataNumber(data, position, count);
+    Network::readDataNumber(data, position, morale);
+    Network::readDataNumber(data, position, attackPotential);
 }
 
 void Unit::writeTargetData(vector<unsigned char>& data){

@@ -8,7 +8,7 @@
 
 #include "Math.hpp"
 
-double Math::mod(double a, double n){
+float Math::mod(float a, float n){
     return a - floor(a/n) * n;
 }
 
@@ -17,7 +17,7 @@ bool Math::intersect(int ax, int ay, int aw, int ah, int bx, int by, int bw, int
            (abs(ay - by) * 2 <= (ah + bh));
 }
 
-double Math::normalizeAngle(double a){
+float Math::normalizeAngle(float a){
     while(a > PI){
         a -= TAU;
     }
@@ -27,6 +27,6 @@ double Math::normalizeAngle(double a){
     return a;
 }
 
-double Math::closestToZero(double a, double b){
+float Math::closestToZero(float a, float b){
     return min(abs(a), abs(b));
 }

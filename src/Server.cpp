@@ -141,6 +141,13 @@ void Server::processPacket(ClientConnection* from, unsigned char code, unsigned 
             sendPacketToAll(PACKET_TC_UNIT_TARGET_REACHED, from->general->units[uid]);
             break;
         }
+        case PACKET_TS_UNIT_REMOVE:{
+            UID uid;
+            Network::readDataNumber(data, position, uid);
+            from->general->unitsToRemove.push_back(uid);
+            sendPacketToAll(PACKET_TC_UNIT_REMOVE, from->general->units[uid]);
+            break;
+        }
         default:{
             debugf("Server recived packet it shoudlen't have: %d", code);
             break;
@@ -190,6 +197,11 @@ void Server::sendPacket(ClientConnection* to, unsigned char code, void* meta, bo
         case PACKET_TC_UNIT_TARGET_REACHED:{
             Network::addDataNumber(data, ((Unit*)meta)->general->uid);
             ((Unit*)meta)->writePosData(data);
+            break;
+        }
+        case PACKET_TC_UNIT_REMOVE:{
+            Network::addDataNumber(data, ((Unit*)meta)->general->uid);
+            Network::addDataNumber(data, ((Unit*)meta)->uid);
             break;
         }
         default:{
