@@ -14,7 +14,7 @@
 class Server;
 class General;
 
-class ClientConnection{
+class ClientConnection : public Network::CanPreProcessPacket{
 public:
 
     TCPsocket* hostSocket;
@@ -36,6 +36,8 @@ public:
     ClientConnection(TCPsocket* hostSocket, TCPsocket* socket, Server* server);
 
     void update();
+
+    virtual void preProcessPacket(int r, unsigned char code, unsigned char* data);
 
 };
 

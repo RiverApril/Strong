@@ -11,6 +11,10 @@
 
 namespace Network{
 
+    void CanPreProcessPacket::preProcessPacket(int r, unsigned char code, unsigned char* data){
+        errorf("CanPreProcessPacket::preProcessPacket() is not overloaded");
+    }
+
     void init(){
         if (SDLNet_Init() < 0) {
     		errorf("SDLNet_Init: %s", SDLNet_GetError());
@@ -113,15 +117,15 @@ namespace Network{
         return 0;
     }
 
-    void recivePacket(TCPsocket* socket, function<void(int, unsigned char, unsigned char*)> process){
+    void recivePacket(TCPsocket* socket, CanPreProcessPacket* process){
 
         PacketSize_t s = 1+sizeof(PacketSize_t);
         unsigned char data1[s];
         int r = Network::reciveData(socket, data1, s);
         if(r == 0){
-            process(0, 0, nullptr);
+            process->preProcessPacket(0, 0, nullptr);
         }else if(r == -1){
-            process(-1, 0, nullptr);
+            process->preProcessPacket(-1, 0, nullptr);
         }else{
             s = 0;
 
@@ -133,14 +137,14 @@ namespace Network{
                 unsigned char data2[s];
                 int r = Network::reciveData(socket, data2, s);
                 if(r == 0){
-                    process(0, 0, nullptr);
+                    process->preProcessPacket(0, 0, nullptr);
                 }else if(r == -1){
-                    process(-1, 0, nullptr);
+                    process->preProcessPacket(-1, 0, nullptr);
                 }else{
-                    process(r, data1[0], data2);
+                    process->preProcessPacket(r, data1[0], data2);
                 }
             }else{
-                process(r, data1[0], nullptr);
+                process->preProcessPacket(r, data1[0], nullptr);
             }
         }
     }

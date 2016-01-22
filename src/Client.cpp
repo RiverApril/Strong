@@ -28,27 +28,27 @@ int updateCThread(void* data){
     Client* self = (Client*)data;
 
     while(self->connected){
-
-        Network::recivePacket(self->socket, [self](int r, unsigned char code, unsigned char* data){
-            if(r == 0){
-                self->serverDisconnected(true);
-            }else if(r == -1){
-                self->serverDisconnected(false);
-            }else{
-                self->processPacket(code, data);
-            }
-        });
-
+        Network::recivePacket(self->socket, self);
     }
 
     return 0;
+}
+
+void Client::preProcessPacket(int r, unsigned char code, unsigned char* data){
+    if(r == 0){
+        serverDisconnected(true);
+    }else if(r == -1){
+        serverDisconnected(false);
+    }else{
+        processPacket(code, data);
+    }
 }
 
 void Client::update(){
     world->update();
 }
 
-void Client::setValues(bool setIp, bool setPort, bool setUsername){
+/*void Client::setValues(bool setIp, bool setPort, bool setUsername){
     while(setIp){
         debugf("Enter IP address:");
         cin >> Settings::Client::connectAddress;
@@ -76,7 +76,7 @@ void Client::setValues(bool setIp, bool setPort, bool setUsername){
             debugf("You must enter a Username");
         }
     }
-}
+}*/
 
 void Client::connectToServer(){
 
@@ -109,7 +109,7 @@ void Client::serverDisconnected(bool intentional){
 }
 
 void Client::processPacket(unsigned char code, unsigned char* data){
-    debugf("Client recived code: %d", code);
+    //debugf("Client recived code: %d", code);
     size_t position = 0;
     switch(code){
         case PACKET_TC_REQUEST_CLIENT_INFO:{
@@ -176,9 +176,11 @@ void Client::sendPacket(unsigned char code, void* meta){
         }
         case PACKET_TS_UNIT_TARGET_SET:{
             ((Unit*)meta)->writeTargetData(data);
+            break;
         }
         case PACKET_TS_UNIT_TARGET_REACHED:{
             ((Unit*)meta)->writePosData(data);
+            break;
         }
         default:{
             debugf("Client sending packet it shoudlen't: %d", code);

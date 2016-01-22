@@ -112,7 +112,7 @@ namespace Settings {
         FILE* file = fopen(fileName.c_str(), "w");
         if(file){
             for(Setting* setting: *settingList){
-                fputs((setting->name+":"+setting->getValueAsString()+"").c_str(), file);
+                fputs((setting->name+":"+setting->getValueAsString()+"\n").c_str(), file);
             }
             fclose(file);
         }else{

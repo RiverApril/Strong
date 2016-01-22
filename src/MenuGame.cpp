@@ -117,7 +117,7 @@ bool MenuGame::mouseUp(int x, int y, int button){
         selectY = -1;
     }
 
-    debugf("Selected count: %d", (int)selectedUnits.size());
+    //debugf("Selected count: %d", (int)selectedUnits.size());
 
     return Menu::mouseUp(x, y, button);
 }

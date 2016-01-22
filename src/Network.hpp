@@ -34,6 +34,10 @@ typedef unsigned short PacketSize_t;
 
 namespace Network{
 
+    struct CanPreProcessPacket{
+        virtual void preProcessPacket(int r, unsigned char code, unsigned char* data);
+    };
+
     void init();
     void cleanup();
 
@@ -48,7 +52,7 @@ namespace Network{
     void finishPacket(vector<unsigned char>& data);
 
     int reciveData(TCPsocket* socket, unsigned char* data, PacketSize_t dataSize);
-    void recivePacket(TCPsocket* socket, function<void(int, unsigned char, unsigned char*)> process);
+    void recivePacket(TCPsocket* socket, CanPreProcessPacket* process);
 
 
     template<typename T>

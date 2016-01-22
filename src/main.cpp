@@ -58,7 +58,7 @@ int main(int argc, char* argv[]){
         	Settings::Server::hostPort = port;
         }
 
-        server->setPort(Settings::Server::hostPort == -1);
+        //server->setPort(Settings::Server::hostPort == -1);
 
         Settings::saveSettings(true);
 

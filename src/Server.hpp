@@ -38,7 +38,7 @@ public:
 
     void update();
     void startServer();
-    void setPort(bool setPort);
+    //void setPort(bool setPort);
 
     void clientDisconnected(ClientConnection* cc, bool intentional);
 

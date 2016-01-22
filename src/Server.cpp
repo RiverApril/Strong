@@ -61,7 +61,7 @@ void Server::update(){
 
 }
 
-void Server::setPort(bool setPort){
+/*void Server::setPort(bool setPort){
     while(setPort){
         debugf("Enter host port:");
         cin >> Settings::Server::hostPort;
@@ -71,7 +71,7 @@ void Server::setPort(bool setPort){
             break;
         }
     }
-}
+}*/
 
 void Server::startServer(){
     if(serverIsStarted){
@@ -102,7 +102,7 @@ void Server::clientDisconnected(ClientConnection* cc, bool intentional){
 }
 
 void Server::processPacket(ClientConnection* from, unsigned char code, unsigned char* data){
-    debugf("Server recived code: %d", code);
+    //debugf("Server recived code: %d", code);
 
     size_t position = 0;
     switch (code) {

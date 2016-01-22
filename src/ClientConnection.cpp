@@ -44,19 +44,21 @@ int updateCCThread(void* data){
 
 
     while(self->connected){
-        Network::recivePacket(self->socket, [self](int r, unsigned char code, unsigned char* data){
-            if(r == 0){
-                self->connected = false;
-                self->server->clientDisconnected(self, true);
-            }else if(r == -1){
-                self->connected = false;
-                self->server->clientDisconnected(self, false);
-            }else{
-                self->server->processPacket(self, code, data);
-            }
-        });
+        Network::recivePacket(self->socket, self);
     }
 
     return 0;
 
+}
+
+void ClientConnection::preProcessPacket(int r, unsigned char code, unsigned char* data){
+    if(r == 0){
+        connected = false;
+        server->clientDisconnected(this, true);
+    }else if(r == -1){
+        connected = false;
+        server->clientDisconnected(this, false);
+    }else{
+        server->processPacket(this, code, data);
+    }
 }

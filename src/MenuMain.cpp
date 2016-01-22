@@ -67,6 +67,8 @@ void MenuMain::updateSettingsFromInputs(){
         buttonConnect->enabled = false;
     }
 
+    Settings::saveSettings(false);
+
 }
 
 void MenuMain::update(){

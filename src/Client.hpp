@@ -15,7 +15,7 @@ class World;
 class Window;
 class General;
 
-class Client{
+class Client : public Network::CanPreProcessPacket{
 public:
 
     bool running = true;
@@ -35,12 +35,14 @@ public:
     ~Client();
 
     void update();
-    void setValues(bool setIp, bool setPort, bool setUsername);
+    //void setValues(bool setIp, bool setPort, bool setUsername);
     void connectToServer();
 
     void serverDisconnected(bool intentional);
     void processPacket(unsigned char code, unsigned char* data);
     void sendPacket(unsigned char code, void* meta = nullptr);
+
+    virtual void preProcessPacket(int r, unsigned char code, unsigned char* data);
 
 };
 
