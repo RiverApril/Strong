@@ -151,6 +151,13 @@ void Client::processPacket(unsigned char code, unsigned char* data){
             world->generals[Guid]->units[Uuid]->readPosData(data, position);
             break;
         }
+        case PACKET_TS_UNIT_STATS_UPDATE:{
+            UID Guid, Uuid;
+            Network::readDataNumber(data, position, Guid);
+            Network::readDataNumber(data, position, Uuid);
+            world->generals[Guid]->units[Uuid]->readStatsData(data, position);
+            break;
+        }
         case PACKET_TC_UNIT_REMOVE:{
             UID Guid, Uuid;
             Network::readDataNumber(data, position, Guid);
@@ -178,15 +185,23 @@ void Client::sendPacket(unsigned char code, void* meta){
             break;
         }
         case PACKET_TS_NEW_UNIT:{
+            ((Unit*)meta)->writeUid(data);
             ((Unit*)meta)->writeAllData(data);
             break;
         }
         case PACKET_TS_UNIT_TARGET_SET:{
+            ((Unit*)meta)->writeUid(data);
             ((Unit*)meta)->writeTargetData(data);
             break;
         }
         case PACKET_TS_UNIT_TARGET_REACHED:{
+            ((Unit*)meta)->writeUid(data);
             ((Unit*)meta)->writePosData(data);
+            break;
+        }
+        case PACKET_TC_UNIT_STATS_UPDATE:{
+            ((Unit*)meta)->writeUid(data);
+            ((Unit*)meta)->writeStatsData(data);
             break;
         }
         case PACKET_TS_UNIT_REMOVE:{

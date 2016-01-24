@@ -13,6 +13,10 @@
 #include "Graphics.hpp"
 #include "Math.hpp"
 
+typedef unsigned char Formation;
+const Formation formationDefault = 0;
+const Formation formationUnformed = 1;
+
 class Unit{
 public:
 
@@ -22,6 +26,12 @@ public:
     void writeAllData(vector<unsigned char>& data);
     void readAllData(unsigned char* data, size_t& position);
     Unit(General* general, unsigned char* data, size_t& position);
+
+    void writeUid(vector<unsigned char>& data);
+    void readUid(unsigned char* data, size_t& position);
+
+    void writeStatsData(vector<unsigned char>& data);
+    void readStatsData(unsigned char* data, size_t& position);
 
     void writeTargetData(vector<unsigned char>& data);
     void readTargetData(unsigned char* data, size_t& position);
@@ -34,13 +44,17 @@ public:
     void setTargetPos(float nx, float ny);
     void setTargetAngle(float nAngle);
 
+    float speedMod();
+
     General* general;
 
     Image* image = Graphics::imageGame;
 
     SDL_Rect clip = Graphics::rect(0, 0, 12, 12);
 
-    UID uid = 0;
+    bool statsChanged = false;
+
+
 
     //Changes Frequently:
     float x = 0;
@@ -52,16 +66,21 @@ public:
     float angle = 0;
     float tAngle = 0;
 
-    //Mostly constant:
-    float speedMove = 1;
-    float speedRot = TAU/90;
+    //Changes Infrequently:
+    Formation formation = formationDefault;
+    int count = 500; // 0-inf
+    float morale = 1; // 0-1
+    float attackPotential = 1; // 0-1
 
+    //Mostly constant:
+    float baseSpeedMove = 1;
+    float baseSpeedRot = TAU/90;
     float width = 12;
     float height = 12;
+    int maxCount = 500;
 
-    int count = 500;
-    float morale = 1;
-    float attackPotential = 1;
+    UID uid = 0;
+
 
     
 };

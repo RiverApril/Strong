@@ -56,6 +56,18 @@ bool MenuGame::keyPressed(SDL_Keysym key){
             }
         }
         selectedUnits.clear();
+    }else if(key.sym == SDLK_2){
+        for(Unit* unit : selectedUnits){
+            if(unit){
+                if(unit->formation == formationDefault){
+                    unit->formation = formationUnformed;
+                    unit->statsChanged = true;
+                }else if(unit->formation == formationUnformed){
+                    unit->formation = formationDefault;
+                    unit->statsChanged = true;
+                }
+            }
+        }
     }
     return Menu::keyPressed(key);
 }

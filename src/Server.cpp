@@ -141,6 +141,13 @@ void Server::processPacket(ClientConnection* from, unsigned char code, unsigned 
             sendPacketToAll(PACKET_TC_UNIT_TARGET_REACHED, from->general->units[uid]);
             break;
         }
+        case PACKET_TS_UNIT_STATS_UPDATE:{
+            UID uid;
+            Network::readDataNumber(data, position, uid);
+            from->general->units[uid]->readStatsData(data, position);
+            sendPacketToAll(PACKET_TC_UNIT_STATS_UPDATE, from->general->units[uid]);
+            break;
+        }
         case PACKET_TS_UNIT_REMOVE:{
             UID uid;
             Network::readDataNumber(data, position, uid);
@@ -186,17 +193,26 @@ void Server::sendPacket(ClientConnection* to, unsigned char code, void* meta, bo
         }
         case PACKET_TC_NEW_UNIT:{
             Network::addDataNumber(data, ((Unit*)meta)->general->uid);
+            ((Unit*)meta)->writeUid(data);
             ((Unit*)meta)->writeAllData(data);
             break;
         }
         case PACKET_TC_UNIT_TARGET_SET:{
             Network::addDataNumber(data, ((Unit*)meta)->general->uid);
+            ((Unit*)meta)->writeUid(data);
             ((Unit*)meta)->writeTargetData(data);
             break;
         }
         case PACKET_TC_UNIT_TARGET_REACHED:{
             Network::addDataNumber(data, ((Unit*)meta)->general->uid);
+            ((Unit*)meta)->writeUid(data);
             ((Unit*)meta)->writePosData(data);
+            break;
+        }
+        case PACKET_TC_UNIT_STATS_UPDATE:{
+            Network::addDataNumber(data, ((Unit*)meta)->general->uid);
+            ((Unit*)meta)->writeUid(data);
+            ((Unit*)meta)->writeStatsData(data);
             break;
         }
         case PACKET_TC_UNIT_REMOVE:{
