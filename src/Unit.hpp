@@ -53,6 +53,10 @@ public:
     SDL_Rect clip = Graphics::rect(0, 0, 12, 12);
 
     bool statsChanged = false;
+    bool movingOutOfTheWay = false;
+    float ttAngle = 0;
+    float ttx = 0;
+    float tty = 0;
 
 
 
@@ -77,6 +81,7 @@ public:
     float baseSpeedRot = TAU/90;
     float width = 12;
     float height = 12;
+    float collisionRadius = 6;
     int maxCount = 500;
 
     UID uid = 0;

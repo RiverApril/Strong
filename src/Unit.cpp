@@ -36,10 +36,15 @@ void Unit::setTargetPos(float nx, float ny){
     tx = nx;
     ty = ny;
     tAngle = Math::normalizeAngle(atan2(ty-y, tx-x));
+
+    ttx = tx;
+    tty = ty;
+    ttAngle = tAngle;
 }
 
 void Unit::setTargetAngle(float nAngle){
     tAngle = Math::normalizeAngle(nAngle);
+    ttAngle = tAngle;
 }
 
 float Unit::speedMod(){
@@ -64,6 +69,48 @@ void Unit::update(){
     float speedRot = baseSpeedRot * speedMod();
     float speedMove = baseSpeedMove * speedMod();
 
+    Unit* moveAway = nullptr;
+    float dist = 0;
+
+    for(pair<UID, Unit*> p: general->units){
+        if(p.first == uid){
+            continue;
+        }
+        if(p.first < uid){//one way so there isn't duplacate updates
+
+            dist = SQUARE(collisionRadius + p.second->collisionRadius) - Math::distanceSquared(x, y, p.second->x, p.second->y);
+            
+            if(p.second->general->uid != general->uid){ //different team
+
+            }else{//same team
+                if(!moveAway){
+                    if(dist >= 0){
+                        moveAway = p.second;
+                        if(!movingOutOfTheWay){
+                            movingOutOfTheWay = true;
+                            ttAngle = tAngle;
+                            ttx = tx;
+                            tty = ty;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if(movingOutOfTheWay){
+        if(moveAway){
+            tAngle = Math::normalizeAngle(atan2(moveAway->y-y, moveAway->x-x)+PI);
+            tx = x + (cos(tAngle) * (collisionRadius + moveAway->collisionRadius));
+            ty = y + (sin(tAngle) * (collisionRadius + moveAway->collisionRadius));
+        }else{
+            tAngle = ttAngle;
+            tx = ttx;
+            ty = tty;
+            movingOutOfTheWay = false;
+        }
+    }
+
     if(x != tx || y != ty || angle != tAngle){
 
         float dir = Math::mod(((tAngle - angle) + PI), TAU) - PI;
@@ -84,7 +131,7 @@ void Unit::update(){
             y = ty;
         }
 
-        if(x != tx || y != ty){
+        if((x != tx || y != ty) && (angle == tAngle || Math::distanceSquared(x, y, tx, ty) > SQUARE((TAU/speedRot)*speedMove/TAU))){
             x += speedMove * cos(angle);
             y += speedMove * sin(angle);
             tAngle = Math::normalizeAngle(atan2(ty-y, tx-x));
@@ -123,6 +170,7 @@ void Unit::writeAllData(vector<unsigned char>& data){
     Network::addDataNumber(data, baseSpeedRot);
     Network::addDataNumber(data, width);
     Network::addDataNumber(data, height);
+    Network::addDataNumber(data, collisionRadius);
     Network::addDataNumber(data, maxCount);
 }
 
@@ -135,6 +183,7 @@ void Unit::readAllData(unsigned char* data, size_t& position){
     Network::readDataNumber(data, position, baseSpeedRot);
     Network::readDataNumber(data, position, width);
     Network::readDataNumber(data, position, height);
+    Network::readDataNumber(data, position, collisionRadius);
     Network::readDataNumber(data, position, maxCount);
 
 }

@@ -17,12 +17,16 @@
 int main(int argc, char* argv[]){
 
     bool runServer = false;
+    bool runClient = false;
 
     if(argc >= 2){
         if(strcmp(argv[1], "s") == 0){
             runServer = true;
         }else if(strcmp(argv[1], "c") == 0){
-            runServer = false;
+            runClient = true;
+        }else if(strcmp(argv[1], "h") == 0){
+            runServer = true;
+            runClient = true;
         }
     }
 
@@ -31,43 +35,43 @@ int main(int argc, char* argv[]){
     int port = -1;
 
     if(argc >= 3){
-        if(runServer){
-            port = stoi(argv[2]);
-        }else{
+        if(runClient){
             string s = string(argv[2]);
             size_t i = s.find(':');
             address = s.substr(0, i);
             port = stoi(s.substr(i+1));
+        }else if(runServer){
+            port = stoi(argv[2]);
         }
     }
 
     if(argc >= 4){
-        if(!runServer){
+        if(!runClient){
             username = string(argv[3]);
         }
     }
 
     Network::init();
 
+    Server* server = nullptr;
+    Window* window = nullptr;
+
     if(runServer){
-        Server* server = new Server();
+        server = new Server();
 
         Settings::loadSettings(true);
 
         if(port != -1){
-        	Settings::Server::hostPort = port;
+            Settings::Server::hostPort = port;
         }
-
-        //server->setPort(Settings::Server::hostPort == -1);
 
         Settings::saveSettings(true);
 
         server->startServer();
 
-        while(server->running){
-            server->update();
-        }
-    }else{
+    }
+
+    if(runClient){
         Graphics::init();
 
         Settings::loadSettings(false);
@@ -81,19 +85,23 @@ int main(int argc, char* argv[]){
         if(username.size() != 0){
             Settings::Client::connectUsername = username;
         }
-        
-        
-        Window* window = new Window();
-
-        //window->client->setValues(Settings::Client::connectAddress.size() == 0, Settings::Client::connectPort == -1, Settings::Client::connectUsername.size() == 0);
 
         Settings::saveSettings(false);
 
-        //window->client->connectToServer();
+        window = new Window();
 
-        while(window->running){
+    }
+
+    while((!server || server->running) && (!window || window->running)){
+        if(server){
+            server->update();
+        }
+        if(window){
             window->update();
         }
+    }
+
+    if(runClient){
         Graphics::cleanup();
     }
 

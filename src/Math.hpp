@@ -16,6 +16,8 @@
 #define DEG_PER_RAD (360/TAU)
 #define RAD_PER_DEG (TAU/360)
 
+#define SQUARE(a) (a*a)
+
 namespace Math {
 
 
@@ -30,6 +32,8 @@ namespace Math {
     }
 
     float mod(float a, float n);
+
+    float distanceSquared(float x1, float y1, float x2, float y2);
 
     bool intersect(int ax1, int ay1, int ax2, int ay2, int bx1, int by1, int bx2, int by2);
 
