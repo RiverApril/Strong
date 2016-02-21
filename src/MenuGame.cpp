@@ -42,10 +42,7 @@ bool MenuGame::keyPressed(SDL_Keysym key){
         int x, y;
         SDL_GetMouseState(&x, &y);
 
-        unit->x = x;
-        unit->y = y;
-        unit->tx = x;
-        unit->ty = y;
+        unit->teleport(x, y);
         
         window->client->sendPacket(PACKET_TS_NEW_UNIT, unit);
         return true;
@@ -122,7 +119,7 @@ bool MenuGame::mouseUp(int x, int y, int button){
 
         for(map<UID, Unit*>::iterator i=general->units.begin(); i!=general->units.end(); ++i){
             Unit* unit = i->second;
-            if(unit && Math::intersect(viewOffsetX+unit->x, viewOffsetX+unit->y, unit->width, unit->height, selectCenterX, selectCenterY, selectWidth, selectHeight)){
+            if(unit && Math::intersect(viewOffsetX+unit->orientNow.x, viewOffsetX+unit->orientNow.y, unit->width, unit->height, selectCenterX, selectCenterY, selectWidth, selectHeight)){
                 selectedUnits.push_back(unit);
                 if(selectInitX == selectX && selectInitY == selectY){
                     break;
@@ -168,7 +165,7 @@ void MenuGame::render(){
     if(selectedUnits.size() > 0){
         for(Unit* unit : selectedUnits){
             if(unit){
-            	Graphics::drawImageEx(window, viewOffsetX+unit->x-(unit->width/2), viewOffsetY+unit->y-(unit->height/2), unit->width, unit->height, Graphics::imageGame, &arrowClip, unit->angle*DEG_PER_RAD, (unit->width/2), (unit->height/2));
+            	Graphics::drawImageEx(window, viewOffsetX+unit->orientNow.x-(unit->width/2), viewOffsetY+unit->orientNow.y-(unit->height/2), unit->width, unit->height, Graphics::imageGame, &arrowClip, unit->orientNow.a*DEG_PER_RAD, (unit->width/2), (unit->height/2));
             }
         }
     }

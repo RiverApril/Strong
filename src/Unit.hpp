@@ -12,6 +12,7 @@
 #include "General.hpp"
 #include "Graphics.hpp"
 #include "Math.hpp"
+#include "Orientation.hpp"
 
 typedef unsigned char Formation;
 const Formation formationDefault = 0;
@@ -43,9 +44,12 @@ public:
     void render();
     void setTargetPos(float nx, float ny);
     void setTargetAngle(float nAngle);
+    void teleport(float x, float y);
 
     float speedMod();
 
+
+	//Local Only
     General* general;
 
     Image* image = Graphics::imageGame;
@@ -54,21 +58,13 @@ public:
 
     bool statsChanged = false;
     bool movingOutOfTheWay = false;
-    float ttAngle = 0;
-    float ttx = 0;
-    float tty = 0;
 
 
 
     //Changes Frequently:
-    float x = 0;
-    float y = 0;
-
-    float tx = 0;
-    float ty = 0;
-
-    float angle = 0;
-    float tAngle = 0;
+    Orientation orientNow = Orientation(0, 0, 0);
+    Orientation orientSubTarget = Orientation(0, 0, 0);
+    Orientation orientTarget = Orientation(0, 0, 0);
 
     //Changes Infrequently:
     Formation formation = formationDefault;

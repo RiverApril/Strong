@@ -33,18 +33,23 @@ Unit::Unit(General* general, unsigned char* data, size_t& position){
 }
 
 void Unit::setTargetPos(float nx, float ny){
-    tx = nx;
-    ty = ny;
-    tAngle = Math::normalizeAngle(atan2(ty-y, tx-x));
+    orientTarget.x = nx;
+    orientTarget.y = ny;
+    orientTarget.a = Math::normalizeAngle(atan2(orientTarget.y - orientNow.y, orientTarget.x - orientNow.x));
 
-    ttx = tx;
-    tty = ty;
-    ttAngle = tAngle;
+    orientSubTarget = orientTarget;
 }
 
 void Unit::setTargetAngle(float nAngle){
-    tAngle = Math::normalizeAngle(nAngle);
-    ttAngle = tAngle;
+    orientTarget.a = Math::normalizeAngle(nAngle);
+    orientSubTarget.a = orientTarget.a;
+}
+
+void Unit::teleport(float x, float y){
+    orientNow.x = x;
+    orientNow.y = y;
+    orientTarget = orientNow;
+    orientSubTarget = orientNow;
 }
 
 float Unit::speedMod(){
@@ -65,8 +70,50 @@ float Unit::speedMod(){
 
 void Unit::update(){
 
-
     float speedRot = baseSpeedRot * speedMod();
+    float speedMove = baseSpeedMove * speedMod();
+
+    if(orientNow != orientSubTarget){
+
+        if(abs(orientNow.a - orientSubTarget.a) < speedRot){
+            orientNow.a = orientSubTarget.a;
+        }else{
+            float dir = Math::mod(((orientSubTarget.a - orientNow.a) + PI), TAU) - PI;
+            orientNow.a = Math::normalizeAngle(orientNow.a+(dir>0?speedRot:-speedRot));
+        }
+
+        if(abs(orientNow.x - orientSubTarget.x) < speedMove && abs(orientNow.y - orientSubTarget.y) < speedMove){
+            orientNow.x = orientSubTarget.x;
+            orientNow.y = orientSubTarget.y;
+        }else{
+
+            for(pair<UID, Unit*> p: general->units){
+                if(p.first != uid){
+                    if(SQUARE((collisionRadius + p.second->collisionRadius)) < orientNow.distSqr(p.second->orientNow)){
+                        orientSubTarget.a = Math::normalizeAngle(((Math::mod(((orientSubTarget.a - orientNow.a) + PI), TAU) - PI) / 2) + PI);
+                    }
+                }
+            }
+
+            orientNow.x += speedMove * cos(orientNow.a);
+            orientNow.y += speedMove * sin(orientNow.a);
+
+        }
+
+
+
+    }else if(orientSubTarget != orientTarget){
+        orientSubTarget = orientTarget;
+    }else{
+        if(server){
+            server->sendPacketToAll(PACKET_TC_UNIT_TARGET_REACHED, this);
+        }
+    }
+
+
+
+
+    /*float speedRot = baseSpeedRot * speedMod();
     float speedMove = baseSpeedMove * speedMod();
 
     Unit* moveAway = nullptr;
@@ -141,7 +188,7 @@ void Unit::update(){
             server->sendPacketToAll(PACKET_TC_UNIT_TARGET_REACHED, this);
         }
 
-    }
+    }*/
 
 
     if(statsChanged){
@@ -158,7 +205,7 @@ void Unit::update(){
 }
 
 void Unit::render(){
-    Graphics::drawImage(client->window, viewOffsetX+x-(width/2), viewOffsetY+y-(height/2), width, height, image, &clip);
+    Graphics::drawImage(client->window, viewOffsetX+orientNow.x-(width/2), viewOffsetY+orientNow.y-(height/2), width, height, image, &clip);
 }
 
 void Unit::writeAllData(vector<unsigned char>& data){
@@ -211,27 +258,21 @@ void Unit::readStatsData(unsigned char* data, size_t& position){
 }
 
 void Unit::writeTargetData(vector<unsigned char>& data){
-    Network::addDataNumber(data, tx);
-    Network::addDataNumber(data, ty);
-    Network::addDataNumber(data, tAngle);
+    orientTarget.write(data);
 }
 
 void Unit::readTargetData(unsigned char* data, size_t& position){
-    Network::readDataNumber(data, position, tx);
-    Network::readDataNumber(data, position, ty);
-    Network::readDataNumber(data, position, tAngle);
+    orientTarget.read(data, position);
 }
 
 void Unit::writePosData(vector<unsigned char>& data){
-    Network::addDataNumber(data, x);
-    Network::addDataNumber(data, y);
-    Network::addDataNumber(data, angle);
+    orientNow.write(data);
+    orientSubTarget.write(data);
 }
 
 void Unit::readPosData(unsigned char* data, size_t& position){
-    Network::readDataNumber(data, position, x);
-    Network::readDataNumber(data, position, y);
-    Network::readDataNumber(data, position, angle);
+    orientNow.read(data, position);
+    orientSubTarget.read(data, position);
 }
 
 

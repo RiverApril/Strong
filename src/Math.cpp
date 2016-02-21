@@ -14,10 +14,6 @@ namespace Math {
         return a - floor(a/n) * n;
     }
 
-    float distanceSquared(float x1, float y1, float x2, float y2){
-        return (SQUARE(abs(x1-x2)) + SQUARE(abs(y1-y2)));
-    }
-
     bool intersect(int ax, int ay, int aw, int ah, int bx, int by, int bw, int bh){
         return (abs(ax - bx) * 2 <= (aw + bw)) &&
                (abs(ay - by) * 2 <= (ah + bh));

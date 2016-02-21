@@ -33,8 +33,6 @@ namespace Math {
 
     float mod(float a, float n);
 
-    float distanceSquared(float x1, float y1, float x2, float y2);
-
     bool intersect(int ax1, int ay1, int ax2, int ay2, int bx1, int by1, int bx2, int by2);
 
     float normalizeAngle(float a);
