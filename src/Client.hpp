@@ -21,6 +21,10 @@ public:
     bool running = true;
     bool connected = false;
 
+    bool packetLock = false;
+    bool updateLock = false;
+    bool packetWaiting = false;
+
     SDL_Thread* threadRecive;
 
     TCPsocket* socket = new TCPsocket();

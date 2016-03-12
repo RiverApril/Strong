@@ -77,6 +77,7 @@ void Unit::update(){
 
         if(abs(orientNow.a - orientSubTarget.a) < speedRot){
             orientNow.a = orientSubTarget.a;
+            orientSubTarget.a = Math::normalizeAngle(atan2(orientSubTarget.y - orientNow.y, orientSubTarget.x - orientNow.x));
         }else{
             float dir = Math::mod(((orientSubTarget.a - orientNow.a) + PI), TAU) - PI;
             orientNow.a = Math::normalizeAngle(orientNow.a+(dir>0?speedRot:-speedRot));

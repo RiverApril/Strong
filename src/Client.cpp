@@ -40,12 +40,21 @@ void Client::preProcessPacket(int r, unsigned char code, unsigned char* data){
     }else if(r == -1){
         serverDisconnected(false);
     }else{
+        packetWaiting = true;
+        while(updateLock);
+        packetLock = true;
         processPacket(code, data);
+        packetLock = false;
+        packetWaiting = false;
     }
 }
 
 void Client::update(){
+    while(packetLock);
+    updateLock = true;
     world->update();
+    updateLock = false;
+    while(packetWaiting);
 }
 
 /*void Client::setValues(bool setIp, bool setPort, bool setUsername){
